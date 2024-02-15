@@ -1,0 +1,51 @@
+参考
+https://blog.csdn.net/mrliuzhao/article/details/89453082
+
+图参考:
+https://www.baeldung.com/java-bytebuffer
+
+
+ByteBuffer包含几个基本的属性：
+
+position：当前的下标位置，表示进行下一个读写操作时的起始位置；
+limit：结束标记下标，表示进行下一个读写操作时的（最大）结束位置；
+capacity：该ByteBuffer容量；
+mark: 自定义的标记位置；
+
+这4个属性总会满足如下关系：mark <= position <= limit <= capacity。
+
+其中position和limit属性也可以分别通过ByteBuffer.position(int newPos)、ByteBuffer.limit(int newLim)进行设置
+
+ByteBuffer.remaining();查看该ByteBuffer当前的剩余可用长度。
+
+实际应用中更常用的是flip()方法，该方法不仅将position复位为0，同时也将limit的位置放置在了position之前所在的位置上，
+这样position和limit之间即为新读取到的有效数据。如下图：
+
+                                       capacity
+=========================================
+                  position             limit
+
+flip 之后
+                                       capacity
+=========================================
+position          limit
+
+
+总之ByteBuffer的基本用法就是：
+初始化（allocate）–> 写入数据（read / put）–> 转换为写出模式（flip）–> 写出数据（get）–> 转换为写入模式（compact）–> 写入数据（read / put）…
+
+compact, 把 unread data 给拷贝到头部,
+
+                                       capacity
+=========================================
+          position(un read)    limit
+
+compact 后
+                                       capacity
+=========================================
+(un read)position                      limit
+
+
+
+
+

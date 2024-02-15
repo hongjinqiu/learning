@@ -1,0 +1,59 @@
+https://www.theserverside.com/
+
+https://www.theserverside.com/news/1365083/Distributed-Computing-Made-Easy
+Terracotta for Spring
+
+Hadoop MapReduce
+
+GridGain 改名了，现在叫:
+ignite是分布式内存网格的一种实现，其基于java平台，具有可持久化，分布式事务，分布式计算等特点，
+此外还支持丰富的键值存储以及SQL语法 (基于h2引擎)，可以看成是一个分布式内存数据库。 与ignite类似的产品有gemfire (12306目前正在使用)，其开源版为geode。
+
+网格计算,
+
+1. forkjoin, java7 开始, 单虚拟机内的 map, reduce
+
+1.1. 一个特殊的 ForkJoinTask 子类, CountedCompleter, 父任务产生子任务, 不等待子任务结束,自己先结束了, 但是可以汇总结果。
+参考:
+https://blog.csdn.net/Xp545945/article/details/106402529
+本机测试代码, 位于:D:\git\jvm\src\main\java\com\packtpub\java9\concurrency\cookbook\chapter05
+
+
+2. CompletionService, CompletableFuture 的折腾,		文件位于:java9并发编程实战\CompletableFuture示例.txt
+
+3. JAVA8的并行流, 以流的方式, 并发运行一些代码,
+本机测试代码, 位于:D:\git\jvm\src\main\java\com\packtpub\java9\concurrency\cookbook\chapter06
+
+4. JAVA8的并发集合类, 
+本机测试代码, 位于:D:\git\jvm\src\main\java\com\packtpub\java9\concurrency\cookbook\chapter07
+
+4. nio相关,
+
+5. CockroachDB 分布式事务代码研究,		https://blog.csdn.net/qq_38125183/article/details/81591012
+	https://www.cockroachlabs.com/blog/parallel-commits/
+	https://www.cockroachlabs.com/blog/transaction-pipelining/
+	CockroachDB paper,
+	https://dl.acm.org/doi/pdf/10.1145/3318464.3386134
+
+DirectIO, 看要如何来清除一番, 看到 203 页, 喵的,
+
+继续开搞相关的内容,喵的, 看到 216 页,
+
+
+
+https://www.51cto.com/article/709819.html
+分库分表会带来读扩散问题？怎么解决？
+
+
+<<Java高并发核心编程（卷1）：NIO、Netty、Redis、ZooKeeper>> 尼恩
+四种常见的IO模型,			https://link.juejin.cn/?target=https%3A%2F%2Fblog.csdn.net%2Fldw201510803006%2Farticle%2Fdetails%2F119767467%3Fspm%3D1001.2014.3001.5501
+内核提供的select/poll/epoll模型,	https://link.juejin.cn/?target=https%3A%2F%2Fblog.csdn.net%2Fldw201510803006%2Farticle%2Fdetails%2F124223086%3Fspm%3D1001.2014.3001.5501
+doug lea - scalable io in java,		https://link.juejin.cn/?target=http%3A%2F%2Fwww.4e00.com%2Fblog%2Fjava%2F2019%2F03%2F15%2Fdoug-lea-scalable-io-in-java.html
+Understanding Reactor Pattern for Highly Scalable I/O Bound Web Server,		https://link.juejin.cn/?target=https%3A%2F%2Ftianpan.co%2Fblog%2F2015-01-13-understanding-reactor-pattern-for-highly-scalable-i-o-bound-web-server
+<<Java高并发核心编程（卷1）：NIO、Netty、Redis、ZooKeeper>> 尼恩
+
+
+
+
+
+

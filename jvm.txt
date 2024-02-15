@@ -1,0 +1,168 @@
+看到 456 页,		6.4.4 类型转换指令
+
+Partial GC
+	-- Minor GC/Young GC (针对新生代的GC)
+	-- Major GC/Old GC(针对老年代的GC)
+Mixed GC (新生代收集,老年代也收集)
+
+Full GC(收集整个 java 堆和方法区的垃圾回收)
+
+现在大多数的垃圾回收算法,都是 标记-复制 算法,
+
+用 8:1 的关系, 
+Eden, Survior, 还有另外一块 Survior, 
+垃圾回收时, 把 Eden + Survior 
+
+Read Barrier,
+
+安全点,安全区域,
+
+记忆集与卡表,
+
+-XX:+PrintGC,
+-Xlog:gc:
+
+
+从JDK 5起，java.lang.Thread类新增了一个getAllStackTraces()方法用于获取虚拟机中所有线程的
+StackTraceElement对象。使用这个方法可以通过简单的几行代码完成jstack的大部分功能，在实际项目
+中不妨调用这个方法做个管理员页面，可以随时使用浏览器来查看线程堆栈，如代码清单4-5所示，这
+也算是笔者的一个小经验
+
+
+列举一下它列出来的这些东东，用 jstack, jmap, 来分析分析,
+
+
+参数interval和count代表查询间隔和次数，如果省略这2个参数，说明只查询一次。假设需要每250
+毫秒查询一次进程2764垃圾收集状况，一共查询20次，那命令应当是：
+jstat -gc 2764 250 20
+
+2012-08-29T19:14:30.968+0800: 10069.800: 
+[GC10099.225: [SoftReference, 0 refs, 0.0000109 secs]10099.226: 
+[WeakReference, 4072 refs, 0.0012099 secs]10099.227: [FinalReference, 984 refs, 1.5822450 secs]10100.809: [PhantomReference, 251 refs, 0.0001394 secs]10100.809: [JNI Weak Reference, 0.0994015 secs] [PSYoungGen: 175672K->8528K(167360K)] 251523K->100182K(353152K), 31.1580402 secs] [Times: user=0.61 sys=0.52, real=31.16 secs]
+除
+
+
+289页, 有 eclipse 的垃圾收集日志,
+
+u2, 2 个 8字节, 1个字节=8个二进制位 = 2个16进制符,
+
+4 * 2 = 8
+
+为了使可配置的封装隔离机制能够兼容传统的类路径查找机制，JDK 9提出了与“类路径”（ClassPath）相对应的“模块路径”（ModulePath）的概念。
+
+
+bookstrap,
+
+
+Java虚拟机以方法作为最基本的执行单元，“栈帧”（Stack Frame）则是用于支持虚拟机进行方法
+调用和方法执行背后的数据结构，它也是虚拟机运行时数据区中的虚拟机栈（Virtual Machine Stack）[1]的栈元素。
+
+
+
+
+
+
+
+polymorphic
+
+看到了 620 页, 
+
+-XX：-BackgroundCompilation来禁止后台编译, 停止等待即时编译的结果再运行,
+
+读者可以下载或自己编译出与自己机器相符合的反汇编适配器，之后将其放置在JAVA_HOME/lib/amd64/server下[3]，只要与jvm.dll或libjvm.so的
+路径相同即可被虚拟机调用。为虚拟机安装了反汇编适配器之后，我们就可以使用-XX：+PrintAssembly参数要求虚拟机打印编译方法的汇编代码了
+
+
+jdk1.8 jaotc
+JDK 9引入了用于支持对Class文件和模块进行提前编译的工具Jaotc，以减少程序的启动时间和到
+
+
+·最重要的优化技术之一：方法内联。
+·最前沿的优化技术之一：逃逸分析。
+·语言无关的经典优化技术之一：公共子表达式消除。
+·语言相关的经典优化技术之一：数组边界检查消除。
+
+参数-XX：+DoEscapeAnalysis来手动开启逃逸分析,
+参数-XX：+PrintEscapeAnalysis, 来查看分析结果,
+参数-XX：+EliminateAllocations来开启标量替换
+使用+XX：+EliminateLocks来开启同步消除，
+使用参数-XX：+PrintEliminateAllocations查看标量的替换情况
+
+Graal编译器的出现对学习和研究虚拟机代码编译技术实在有着不可估量的价值
+
+
+使用volatile变量的第二个语义是禁止指令重排序优化，普通的变量仅会保证在该方法的执行过程
+
+内核线程（Kernel-Level Thread，KLT）
+
+线程调度有两种方式, 是协同式（Cooperative Threads-Scheduling）线程调度和抢占式（Preemptive Threads-Scheduling）线程调度。
+
+Thread::yield()方法可以主动让出执行时间
+
+设置-Xss或
+-XX：ThreadStackSize,
+
+譬如Kotlin提供的协程实现，一旦遭遇synchronize关键字，那挂起来的仍将是整个线程。
+
+Java虚拟机锁优化,
+
+根据上面的讨论，ReentrantLock在功能上是synchronized的超集，在性能上又至少不会弱于
+synchronized，那synchronized修饰符是否应该被直接抛弃，不再使用了呢？当然不是，基于以下理
+由，笔者仍然推荐在synchronized与ReentrantLock都可满足需要时优先使用synchronized：
+·synchronized是在Java语法层面的同步，足够清晰，也足够简单。每个Java程序员都熟悉
+synchronized，但J.U.C中的Lock接口则并非如此。因此在只需要基础的同步功能时，更推荐synchronized。
+
+看到了 644 页,
+
+这种乐观并发策略的实现不再需要把线程阻塞挂起，因此这种同步操作被称为非阻塞同步（Non-Blocking Synchronization），
+使用这种措施的代码也常被称为无锁（Lock-Free）编程
+
+看到了 647 页,
+
+
+自旋锁在JDK 1.4.2中就已经引入，只不过默认是关闭的，可以使用-XX：+UseSpinning参数来开启，在JDK 6中就已经改为默认开启了。
+
+自旋次数的默认值是十次，用户也可以使用参数-XX：PreBlockSpin来自行更改
+
+13.3.2 锁消除
+如果判断到一段代码中，在堆上的所有数据都不会逃逸出去被其他线程访问到，那就可以把它们当作栈上数据对待，认为它们是线程私有的，同步加锁自然就无须再进行。
+
+看到了 651 页,
+
+13.3.3 锁粗化
+
+13.3.4 轻量级锁
+
+13.3.5 偏向锁
+假设当前虚拟机启用了偏向锁（启用参数-XX：+UseBiased Locking，这是自JDK 6起HotSpot虚拟机的默认值）
+
+早在JDK 1.5之中就已经引入java.util.concurrent包，实现了一个粗粒度的并发框架。
+而JDK 1.7中加入的java.util.concurrent.forkjoin包则是对这个框架的一次重要扩充。
+
+hadoop 之类的东东, 还有 java nio 的东东, fork/join 
+
+
+这个可以查询堆栈数据, 从 jmap 中导出的内容, 689 页,
+附录D 对象查询语言（OQL）简介[1]
+
+
+ForkJoinPool,有一个 java 并发网, 可以去读一读, 喵的,
+
+http://ifeve.com/?x=0&y=0&s=fork
+
+Java 7 Concurrency Cookbook
+
+Java 9 并发编程实战,				running,-----------------------------,
+
+
+哪几章需要重新再读一遍, 喵的,
+
+java 分布式计算框架,
+1、熟悉Python、Scala等语言；
+2、熟悉MapReduce、Storm、Spark、Pig、Sqoop、HBase、Hive等主流大数据技术；
+
+Eureka, Spring Clound, Dubbo Zookeeper, MQ, Docker, Spring Boot, Spark, MapReduce,
+
+
+
+

@@ -1,0 +1,23 @@
+
+HttpClient client = HttpClientBuilder.create().build();
+            HttpPost post = new HttpPost(uploadUrl);
+
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.setCharset(Charset.forName("UTF-8"));
+            builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+            if (file != null && file.exists()) {
+                logger.info("开始发送{} {} 到 {}",contractTypeName, file.getName(), uploadUrl);
+                builder.addBinaryBody("file", file, ContentType.MULTIPART_FORM_DATA, file.getName());
+            }
+            else {
+                logger.info("通知转换成功，{}", outputPath);
+                builder.addBinaryBody("file", new byte[]{}, ContentType.MULTIPART_FORM_DATA, "");
+                builder.addTextBody("convertType", "local");
+            }
+            builder.addTextBody("outputPath", outputPath);
+            builder.addTextBody("contractType", contractType);
+
+            HttpEntity entity = builder.build();
+            post.setEntity(entity);
+
+            HttpResponse response = client.execute(post);

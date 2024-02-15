@@ -1,0 +1,142 @@
+http://ifeve.com/?x=0&y=0&s=JAVA8%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97
+http://colobu.com/2014/10/28/secrets-of-java-8-functional-interface/#1)
+
+
+quasar,java 的纤程库,
+https://github.com/puniverse/quasar
+
+
+
+Lamba表达式,
+
+和 python 中的 lamba 表达式的对比,
+
+方法引用,String::compareToIgnoreCase,
+
+@FunctionalInterface 注解,
+
+
+inv->inv.getTitle()
+String::compare
+
+增加接口,
+1.JAVA8 引入了默认方法,接口中可以添加 default 的实现,
+2.接口现在也可以拥有静态方法,
+
+
+python 中的默认值实现,
+
+go 语言中的默认值实现,
+
+
+第二章
+lambda表达式是一个能够被传递的匿名函数
+
+Runnable r = () -> System.out.println("Hi");
+
+FileFilter isXml = (File f) -> f.getName().endsWith(".xml");
+
+(parameters) -> expression
+
+(parameters) -> { statements;}
+
+如何来自定义 Func,
+
+第三章
+开始进行流式操作
+
+
+阅读一下 Function 的相关实现,
+Comparator,
+
+
+filter,			通过传递一个预期匹配的对象作为参数并返回一个包含所有匹配到的对象的流
+map,			流支持映射方法，传递一个函数对象作为方法，把流中的元素转换成另一种类型
+	List ids = invoices.stream().map(Invoice::getId).collect(Collectors.toList());
+reduce,			另一个常用的模式是把数据源中的所有元素结合起来提供单一的值
+	int sum = numbers.stream().reduce(0, (a, b) -> a + b);
+	int max = numbers.stream().reduce(Integer.MIN_VALUE, Integer::max);
+findFirst,
+allMatch,
+sorted,
+collect,		collect方法是一个结束操作，它可以使流里面的所有元素聚集到汇总结果
+	Map<Customer, List> customerToInvoices = invoices.stream().collect(Collectors.groupingBy(Invoice::getCustomer));
+	Map<String, List<String>> nameMap = persons.stream().collect(Collectors.groupingBy(Person::getFirstName, Collectors.mapping(Person::getLastName, Collectors.toList())));
+	Map<String, Map<String, Integer>> collect = students.stream().collect(Collectors.groupingBy(Student::getClassNumber, Collectors.toMap(Student::getName, student -> student.getMathScores() + student.getChainessScores())));
+	参考: https://cloud.tencent.com/developer/article/2120661 的相关内容,
+
+
+写一条数据呗,喵的,
+
+
+
+CompletableFuture,可以使用声明式的操作来组装多种异步任务,
+
+用 Optional.ofNullable 来避免 null pointer,
+
+跟传统意思上的 map, reduce 不相同,
+
+
+这篇文章中提到的相关的概念有哪些?
+
+接口,
+1.默认实现,
+2.静态方法,
+
+3.时间,
+4.可以有周期,
+
+5.lambda 表达式,
+5.1.相应的方法引用,
+6.stream 流式编程,
+
+default void sort(Comparator<? super E> c){
+	Collections.sort(this,c);
+}
+
+public static <T> Stream<T> of (T…values){
+	return Arrays.stream(values);
+}
+
+
+7.函数接口,	相关阅读,
+函数式接口(Functional Interface)是Java 8对一类特殊类型的接口的称呼。 这类接口只定义了唯一的抽象方法的接口（除了隐含的Object对象的公共方法）， 因此最开始也就做SAM类型的接口（Single Abstract Method）。
+
+已有的函数接口:
+Runnable,
+Callable,
+......
+
+
+几种类型的函数接口:
+Predicate -- 传入一个参数，返回一个bool结果， 方法为boolean test(T t)
+Consumer -- 传入一个参数，无返回值，纯消费。 方法为void accept(T t)
+Function -- 传入一个参数，返回一个结果，方法为R apply(T t)
+	示例:
+	public AbstractResponse applyRequest(String token, Function<String, AbstractResponse> function) {
+		return function.apply(token);
+	}
+	InputInvoicedataSyncResponse response = (InputInvoicedataSyncResponse) applyRequest(token, (tokenParam) -> {
+                return client.inputInvoicedata().sync(request, tokenParam, requestId);
+            });
+Supplier -- 无参数传入，返回一个结果，方法为T get()
+UnaryOperator -- 一元操作符， 继承Function,传入参数的类型和返回类型相同。
+BinaryOperator -- 二元操作符， 传入的两个参数的类型和返回类型相同， 继承BiFunction
+	public Map<String ,LayoutFieldBO> dealOcrResultFrame(JSONObject wordsResultMap, BiFunction<String, JSONArray, Map<String, LayoutFieldBO>> mulLineFunction) {
+		mulLineFunction.apply()
+	}
+	return (k, jsonArray) -> {return Map<String, LayoutFieldBO> 类型};
+
+声明异常
+但是，如果在Lambda表达式中抛出异常， 而目标接口中的抽象函数没有声明这个可检查， 则此接口不能作为此lambda表达式的目标类型。
+
+
+.group 等等之类的东东,
+
+
+
+
+
+
+
+

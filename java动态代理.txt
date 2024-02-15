@@ -1,0 +1,51 @@
+java 反射的内容,
+
+https://mp.weixin.qq.com/s?__biz=MzI1NDU0MTE1NA==&mid=2247483785&idx=1&sn=f696c8c49cb7ecce9818247683482a1c&chksm=e9c2ed84deb564925172b2dd78d307d4dc345fa313d3e44f01e84fa22ac5561b37aec5cbd5b4&scene=0#rd
+
+
+
+public class TimingProxyFactory {
+
+    public static Object getProxy(Object target, Class<?>[] ifcs) {
+        ClassLoader cl = target.getClass().getClassLoader();
+        return Proxy.newProxyInstance(cl, ifcs, new TimingInvocationHandler(target));
+    }
+
+    private static class TimingInvocationHandler implements InvocationHandler {
+
+        private final Object target;
+
+        public TimingInvocationHandler(Object target) {
+            this.target = target;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            // before
+            long start = System.currentTimeMillis();
+            try {
+                Object result = method.invoke(target, args);
+                // after returning
+                return result;
+            } catch (Throwable throwable) {
+                // after throwing
+                throw throwable;
+            } finally {
+                // after
+                long end = System.currentTimeMillis();
+                System.out.println("time in millis: " + (end - start));
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Calculator calculator = (Calculator) TimingProxyFactory.getProxy(new AddCalculator(),
+                new Class[]{Calculator.class});
+        // 控制台输出耗时
+        calculator.calculate(3, 5);
+    }
+}
+
+
+
+

@@ -1,0 +1,204 @@
+1.
+https://netty.io/wiki/user-guide-for-4.x.html
+英文,
+
+2.
+超详细Netty入门，看这篇就够了！ - 知乎
+https://zhuanlan.zhihu.com/p/181239748
+Netty is an asynchronous event-driven network application framework
+for rapid development of maintainable high performance protocol servers & clients.
+Netty是 一个异步事件驱动的网络应用程序框架，用于快速开发可维护的高性能协议服务器和客户端。
+
+如何来断开连接呢? 阅读中,				finish,
+
+==========================
+bossGroup 用于接收客户端传过来的请求，接收到请求后将后续操作交由 workerGroup 处理
+==========================
+
+Bootstrap, ServerBootstrap,
+
+	5.1 taskQueue任务队列
+	5.2 scheduleTaskQueue延时任务队列
+	5.3 Future异步机制
+	5.4 Bootstrap与ServerBootStrap
+	5.4.1 group()
+	5.4.2 channel()
+	5.4.3 option()与childOption()
+
+	有 ChannelInboundHandlerAdapter, 也有 ChannelOutboundHandler,
+
+	channel:一种连接到网络套接字或能进行读、写、连接和绑定等I/O操作的组件。
+
+	示例工程代码位于: D:\git\netty_test,
+
+3.
+https://www.cnblogs.com/nanaheidebk/p/11025362.html
+实战入门详解——让你彻底记住什么是 netty
+
+阅读中,,,
+
+{// 以这种方式能否成功?
+            pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
+            pipeline.addLast("httpServerHandler", new HttpServerChannelHandler0());
+}
+
+channel 的顺序, 依照特定的次序来, 
+
+	-------------------------------------------------
+	ChannelHandler分为 ChannelInBoundHandler 和 ChannelOutboundHandler 两种，如果一个入站 IO 事件被触发，
+	这个事件会从第一个开始依次通过 ChannelPipeline中的 ChannelInBoundHandler，先添加的先执行。
+	-------------------------------------------------
+	若是一个出站 I/O 事件，则会从最后一个开始依次通过 ChannelPipeline 中的 ChannelOutboundHandler，
+	后添加的先执行，然后通过调用在 ChannelHandlerContext 中定义的事件传播方法传递给最近的 ChannelHandler。
+	-------------------------------------------------
+
+看到了这个地方,				
+
+ChannelPipeline p = ...;
+p.addLast("1", new InboundHandlerA());
+p.addLast("2", new InboundHandlerB());
+p.addLast("3", new OutboundHandlerA());
+p.addLast("4", new OutboundHandlerB());
+p.addLast("5", new InboundOutboundHandlerX());
+
+3.5. Netty 线程模型,
+3.5.1. Reactor 单线程模型, 
+	Reactor 单线程模型指的是所有的 IO 操作都在同一个 NIO 线程上面完成。
+	作为 NIO 服务端接收客户端的 TCP 连接，作为 NIO 客户端向服务端发起 TCP 连接，
+	读取通信对端的请求或向通信对端发送消息请求或者应答消息。
+
+	这段话不明白, 如果已经有了 workGroup, 为什么还要一个线程池?
+	-------------------------------------------------
+	ChannelPipeline 中的每一个 ChannelHandler 都是通过它的 EventLoop（I/O 线程）来处理传递给它的事件的。所以至关重要的是不要阻塞这个线程，因为这会对整体的 I/O 处理产生严重的负面影响。但有时可能需要与那些使用阻塞 API 的遗留代码进行交互。
+
+	对于这种情况， ChannelPipeline 有一些接受一个 EventExecutorGroup 的 add() 方法。如果一个事件被传递给一个自定义的 EventExecutorGroup， DefaultEventExecutorGroup 的默认实现。
+	-------------------------------------------------
+
+
+3.6.1. 跳出阅读:
+高性能网络编程之 Reactor 网络模型（彻底搞懂）
+https://juejin.cn/post/7092436770519777311
+
+4.
+https://www.zhihu.com/question/24322387				没什么深入的内容,
+通俗地讲，netty 能做什么,
+
+
+5.
+netty 入门长文：基本介绍、环境搭建、动手实战 ...		没什么深入的内容,
+https://zhuanlan.zhihu.com/p/299396057
+
+6.
+45 张图深度解析 netty  架构与原理-腾讯云开发者社区 …			running,--------------------------------,
+https://cloud.tencent.com/developer/article/1754078
+
+这篇文章不错,
+6.1. 直接 IO　技术，
+	ssize_t read(int filedes, void *buf, size_t nbytes);
+	ssize_t write(int filedes, void *buf, size_t nbytes);
+6.2. 内存映射文件技术
+	void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
+6.3. 零拷贝技术
+	ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
+	在 JDK 中，提供的：
+	FileChannel.transderTo(long position, long count, WritableByteChannel target);
+	方法实现了零拷贝过程，其中的第三个参数可以传入 SocketChannel 实例。例如客户端使用以上的零拷贝接口向服务器传输文件的代码为：
+
+
+看到了这个位置, 喵的,
+数据在基于 Netty 的服务器或客户端中的处理流程是：读取数据-->解码数据-->处理数据-->编码数据-->发送数据。其中的每个过程都用得到 ChannelHandler 责任链。
+
+在服务端，通常 Boss EventLoopGroup 只包含一个 Boss EventLoop（单线程），该 EventLoop 维护者一个注册了 ServerSocketChannel 的 Selector 实例。
+该 EventLoop 不断轮询 Selector 得到 OP_ACCEPT 事件（客户端连接事件），然后将接收到的 SocketChannel 交给 Worker EventLoopGroup，
+Worker EventLoopGroup 会通过 next()方法选取一个 Worker EventLoop 并将这个 SocketChannel 注册到其中的 Selector 上，
+由这个 Worker EventLoop 负责该 SocketChannel 上后续的 IO 事件处理。整个过程如下图所示：
+
+
+对于第三种场景，举个例子，比如在基于 Netty 构建的推送系统的业务线程中，要根据用户标识，找到对应的 SocketChannel 引用，
+然后调用 write 方法向该用户推送消息，这时候就会将这一 write 任务放在任务队列中，write 任务最终被异步消费。
+这种情形是对前两种情形的应用，且涉及的业务内容太多，不再给出示例代码，读者有兴趣可以自行完成，这里给出以下提示：
+
+Future, Promise,
+
+Netty 三讲, 第二讲, Netty 的核心源码解析（部分）
+
+https://blog.csdn.net/weixin_41385912/article/details/110944462
+也是码海写的, 继续阅读一番, 随便跑一跑, 喵的,
+本文使用的是 4.1.54 版本的 netty 源码。netty 源码包的总体结构如下，在 io.netty.example 中，官方给我们提供了很多的实例供我们参考。
+有项目实战需求的读者在了解了 Netty 的工作原理和常用 API 之后，可以参考这个包中的案例构建自己的网络 IO 程序。
+
+看到了这个地方, 看得一知半解, 并且要画图, 了解其背后的原理,
+至此，对 ServerBootstrap 实例的.bind(PORT)背后的 Netty 源码运作细节已经讲清楚了。总结如下：
+
+
+Netty 服务端接收客户端连接请求的总体流程为：监听 Accept 事件，接受连接-->创建一个新的 NioSocketChannel-->将新的 NioSocketChannel 注册到 workerGroup 上-->监听 NioSocketChannel 上的 Read 事件。下面追踪代码来验证这一过程。
+
+running,-----------------------------,
+
+还有第三章, netty 网络应用案例, 喵的, 在 github 上?
+
+跟着其它跑一跑, 再返回回来瞄一瞄?
+
+一条 SQL 的执行过程,
+Netty 的应用案例, 
+
+第三讲
+netty 网络应用案例
+https://github.com/allentofight/easy-cs/blob/main/Java/Netty%E5%BA%94%E7%94%A8%E7%AF%87.md
+
+tcp 在传输数据时, 短时间发送的小数据, 其会合并起来传给客户端, 而导致发生粘包的现象, 
+而发送一个超大的文本时, 其会截成几个部分发送出去, 
+
+2.2. Tcp 粘包拆包的解决方案
+知道数据的边界, 就不会出现多读, 少读的问题, 可使用 自定义协议 + 编解码器, encode, decode, 
+
+encodedecode,
+
+MyMessageDecoder,解码器,Inbound,
+MyMessageEncoder,编码器,Outbound,
+
+ReplayingDecoder, 可以方便的进行协议的解析, 就好像数据已经完全准备好一样, 其用的是读取, 出错是抛出异常重试的试, 性能会低一些,
+
+
+HttpFullRequest,
+HttpFullResponse,
+
+8. 基于 netty 实现 RPC, dubbo,
+9. Protobuf 简介, 需要引入 protobuf-java, 用它里面的 Encode, Decode 包,
+
+
+
+码海这里面, 有一条 SQL 的执行过程,
+https://github.com/allentofight/easy-cs
+
+d:
+cd D:\git
+git clone 
+
+
+-Dmaven.test.skip=true
+-Dcheckstyle.skip=true
+
+"D:\program files\Java\jdk1.8.0_144\bin\java" -Dmaven.multiModuleProjectDirectory=D:\git\netty "-Dmaven.home=D:\program files\JetBrains\IntelliJ IDEA 2017.2\plugins\maven\lib\maven3" "-Dclassworlds.conf=D:\program files\JetBrains\IntelliJ IDEA 2017.2\plugins\maven\lib\maven3\bin\m2.conf" "-javaagent:D:\program files\JetBrains\IntelliJ IDEA 2017.2\lib\idea_rt.jar=53772:D:\program files\JetBrains\IntelliJ IDEA 2017.2\bin" -Dfile.encoding=UTF-8 -classpath "D:\program files\JetBrains\IntelliJ IDEA 2017.2\plugins\maven\lib\maven3\boot\plexus-classworlds-2.5.2.jar" org.codehaus.classworlds.Launcher -Didea.version=2017.2 -s C:\Users\hongjinqiu\.m2\settings_aliyun.xml -DskipTests=true compile package
+-Dcheckstyle.skip=true
+
+Future 和 Promise 的东东,
+
+详解一条 sql 的执行过程, 
+
+
+
+
+
+7.
+一篇文章看懂 netty 框架
+https://zhuanlan.zhihu.com/p/630890093
+
+8.
+netty 快速入门 - 知乎
+https://zhuanlan.zhihu.com/p/113199536
+
+
+
+
+

@@ -1,0 +1,497 @@
+https://yq.aliyun.com/articles/602084
+读完了, 一般般,
+
+https://my.oschina.net/buru1kan/blog/1814356
+rocketmq-console
+页面不存在,
+
+普通消息的发送流程,
+org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl#sendDefaultImpl
+
+
+RocketMQ架构分为四个模块
+
+1、生产者
+	
+2、消费者
+
+3、namesrv
+	1、生产者从namesrv中获取可用的broker地址，将消息发送至broker。
+	2、消费者从namesrv中获取可用的broker地址，从broker中拉去消息。
+	3、broker定时向naemsrv发送心跳信息，维护可用broker地址。
+4、broker
+	4.1.broker支持主从架构,
+	master写,slave读,
+	4.2.主从复制,
+	决定rocketmq是否为master还是slaver，是从配置文件中读取设定的，如下：
+	public enum BrokerRole {
+		ASYNC_MASTER,	// 异步master，也就是新的消息存储时不需要等slave同步好；
+		SYNC_MASTER,	// 同步master，新消息存现时需要等slave同步好(也就是返回的 Ack Offset >= 当前消息的CommitLog Offset;)
+		SLAVE;		// 指该brokder为slaver
+	}
+5.瞄这个 rocketmq 的东东,
+
+set ROCKETMQ_HOME=E:\hongjinqiu\soft\rocket_mq\rocketmq-all-4.4.0-bin-release
+set JAVA_HOME="D:\program files\Java\jdk1.8.0_144"
+set CLASSPATH="D:\program files\Java\jdk1.8.0_144\lib\dt.jar";"D:\program files\Java\jdk1.8.0_144\lib\tools.jar";"D:\program files\Java\jdk1.8.0_144\jre\lib\rt.jar";
+
+
+Start Name Server
+  > nohup sh bin/mqnamesrv &
+  > tail -f ~/logs/rocketmqlogs/namesrv.log
+  The Name Server boot success...
+
+	Windows: bin\mqnamesrv.cmd
+
+Start Broker
+  > nohup sh bin/mqbroker -n localhost:9876 &
+  > tail -f ~/logs/rocketmqlogs/broker.log 
+  The broker[%s, 172.30.30.233:10911] boot success...
+
+	Windows: bin\mqbroker.cmd
+
+export NAMESRV_ADDR=localhost:9876
+set NAMESRV_ADDR=localhost:9876
+
+Send & Receive Messages
+ > export NAMESRV_ADDR=localhost:9876
+ > sh bin/tools.sh org.apache.rocketmq.example.quickstart.Producer
+ SendResult [sendStatus=SEND_OK, msgId= ...
+
+ bin\tools.cmd org.apache.rocketmq.example.quickstart.Producer
+
+ > sh bin/tools.sh org.apache.rocketmq.example.quickstart.Consumer
+ ConsumeMessageThread_%d Receive New Messages: [MessageExt...
+
+ bin\tools.cmd org.apache.rocketmq.example.quickstart.Consumer
+
+
+Shutdown Servers
+ > sh bin/mqshutdown broker
+ The mqbroker(36695) is running...
+ Send shutdown request to mqbroker(36695) OK
+
+ > sh bin/mqshutdown namesrv
+ The mqnamesrv(36664) is running...
+ Send shutdown request to mqnamesrv(36664) OK
+
+cd E:\hongjinqiu\soft\rocket_mq\rocketmq-externals-master\rocketmq-console
+
+$ mvn clean package -Dmaven.test.skip=true
+$ java -jar target/rocketmq-console-ng-1.0.1.jar
+
+java -jar target\rocketmq-console-ng-1.0.1.jar
+
+访问的url:
+http://localhost:8080/rocketmq
+
+
+
+https://blog.csdn.net/z785495295/article/details/86605553
+finish,
+讲了四种消息, 这文章不是很详细, 但是可以阅读一番, 因为它有画代码流程,
+1.普通消息,
+2.顺序消息,
+3.定时消息,
+4.事务消息,
+
+
+
+Rocketmq特性详解&场景介绍
+
+顺序队列,生产时，相同订单放同一队列，
+消费时，用 MessageListenerOrderly 来消费。
+MessageQueueSelector,
+MessageListenerOrderly,
+
+
+定时触发,
+Schedule example
+message.setDelayTimeLevel(3);
+
+
+batch,批量发消息,
+List<Message> messages = new ArrayList<>();
+messages.add(new Message(topic, "TagA", "OrderID001", "Hello world 0".getBytes()));
+messages.add(new Message(topic, "TagA", "OrderID002", "Hello world 1".getBytes()));
+messages.add(new Message(topic, "TagA", "OrderID003", "Hello world 2".getBytes()));
+producer.send(messages);
+
+Filter,过滤器,
+如果用 SQL 语句,来过滤消息,
+暂不支持，
+
+
+Logappender Example,
+把程序中的日志,发往 RocketMq,
+
+Transaction example
+事务，两个消息一起成功，一起失败，
+TransactionListener,
+producer.setExecutorService(executorService);
+producer.setTransactionListener(transactionListener);
+
+
+
+明天好好瞄这个东东，
+
+RocketMQ支持事务消息机制
+https://www.jianshu.com/p/cc5c10221aa1
+阅读中,						看完了, 但是内容有点旧,
+有没有示例呢?
+
+现如今实现基于两阶段提交的分布式事务也没那么困难了，如果使用java，那么可以使用开源软件atomikos(http://www.atomikos.com/)来快速实现。来快速实现。)
+看到了如下的内容:
+图中执行本地事务（Bob账户扣款）和发送异步消息应该保证同时成功或者同时失败，也就是扣款成功了，发送消息一定要成功，如果扣款失败了，就不能再发送消息。那问题是：我们是先扣款还是先发送消息呢？
+
+TransactionProducer,
+
+
+
+问答相关:
+https://blog.csdn.net/ctwctw/article/details/107463884
+
+
+d:
+cd D:\git
+git clone https://github.com/apache/rocketmq.git
+
+看的是 release-5.1.3 的版本,
+
+D:\git\rocketmq>
+
+
+这一条可以跑成功,
+mvn -Prelease-all -DskipTests=true -Dcheckstyle.skip=true clean install -U --settings C:\Users\hongjinqiu\.m2\settings_aliyun.xml
+
+编译时报 Failed to execute goal com.github.spotbugs:spotbugs-maven-plugin:4.2.2:check (check) on project rocketmq-remoting: failed with 1 bugs and 0 errors  -> [Help 1]
+
+在 pom.xml 里面, 将 spotbugs-maven-plugin 配置为 <configuration><skip>true</skip></configuration> 编译通过,
+
+概念,  如何来使用 RocketMQ, Quick Start,
+
+0.基本概念
+https://rocketmq.apache.org/zh/docs/introduction/02concepts
+running,----------------------------,
+
+0.1. 主题（Topic）
+Apache RocketMQ 中消息传输和存储的顶层容器，用于标识同一类业务逻辑的消息。主题通过TopicName来做唯一标识和区分。更多信息，请参见主题（Topic）。
+
+0.2. 消息类型（MessageType）
+Apache RocketMQ 中按照消息传输特性的不同而定义的分类，用于类型管理和安全校验。 Apache RocketMQ 支持的消息类型有普通消息、顺序消息、事务消息和定时/延时消息。
+
+就这四种类型, 要各自写一个示例, 并跟踪代码,
+普通消息、顺序消息、事务消息和定时/延时消息,
+
+0.3. 消息队列（MessageQueue）
+队列是 Apache RocketMQ 中消息存储和传输的实际容器，也是消息的最小存储单元。 Apache RocketMQ 的所有主题都是由多个队列组成，以此实现队列数量的水平拆分和队列内部的流式存储。队列通过QueueId来做唯一标识和区分。更多信息，请参见队列（MessageQueue）。
+
+0.4. 消息（Message）
+消息是 Apache RocketMQ 中的最小数据传输单元。生产者将业务数据的负载和拓展属性包装成消息发送到服务端，服务端按照相关语义将消息投递到消费端进行消费。更多信息，请参见消息（Message）。
+
+0.5. 消息视图（MessageView）
+消息视图是 Apache RocketMQ 面向开发视角提供的一种消息只读接口。通过消息视图可以读取消息内部的多个属性和负载信息，但是不能对消息本身做任何修改。
+
+0.6. 消息标签（MessageTag）
+消息标签是Apache RocketMQ 提供的细粒度消息分类属性，可以在主题层级之下做消息类型的细分。消费者通过订阅特定的标签来实现细粒度过滤。更多信息，请参见消息过滤。
+
+0.7. 消息位点（MessageQueueOffset）
+消息是按到达Apache RocketMQ 服务端的先后顺序存储在指定主题的多个队列中，每条消息在队列中都有一个唯一的Long类型坐标，这个坐标被定义为消息位点。更多信息，请参见消费进度管理。
+
+0.8. 消费位点（ConsumerOffset）
+一条消息被某个消费者消费完成后不会立即从队列中删除，Apache RocketMQ 会基于每个消费者分组记录消费过的最新一条消息的位点，即消费位点。更多信息，请参见消费进度管理。
+
+读到消息位点, 喵的,
+https://rocketmq.apache.org/zh/docs/introduction/02concepts#%E6%B6%88%E8%B4%B9%E4%BD%8D%E7%82%B9consumeroffset
+
+Apache RocketMQ 的事务消息相关,
+https://rocketmq.apache.org/zh/docs/featureBehavior/04transactionmessage/
+
+
+1.RocketMQ Quick Start,
+https://rocketmq.apache.org/zh/docs/quickStart/01quickstart/
+
+2.RocketMQ 运维相关,
+https://rocketmq.apache.org/zh/docs/deploymentOperations/01deploy
+
+有用的, 喵的,
+
+
+参考这一篇, 如何启动并运行之类的,
+https://blog.csdn.net/woliuqiangdong/article/details/121295330
+
+
+日志位于: C:\Users\hongjinqiu\logs\rocketmqlogs
+
+可以用来奔跑一下, 看一看性能如何了,
+
+日志里面都是些什么东东?
+
+broker 文件位于: E:\hongjinqiu\tmp\rocketmq
+
+
+
+
+
+broker.log
+	一些注册之类的消息, 还有 netty 的消息,
+broker_default.log
+broker_traffic.log
+coldctr.log
+commercial.log
+filter.log
+lock.log
+namesrv.log
+namesrv_default.log
+namesrv_traffic.log
+[otherdays]
+pop.log
+protection.log
+remoting.log
+rocketmq_client.log
+stats.log
+store.log
+storeerror.log
+tools.log
+tools_default.log
+transaction.log
+watermark.log
+
+broker 中耗性能的位置:
+
+Rocketmq,TimerMessageStore,
+
+循环一万条, 写入 RocketMQ, 而产生的耗时时间,
+
+66.7% - 298 s - 1 inv. org.apache.rocketmq.store.timer.TimerMessageStore$TimerFlushService.run
+	63.3% - 286 s - 25 inv. org.apache.rocketmq.store.timer.TimerWheel.flush
+		15.5% - 84,255 ms - 1,177,592,203 inv. java.nio.MappedByteBuffer.get
+		15.5% - 85,083 ms - 1,196,647,836 inv. java.nio.ByteBuffer.get
+	3.8% - 21,507 ms - 32 inv. org.apache.rocketmq.store.timer.TimerMessageStore.getAllCongestNum
+		3.9% - 24,085 ms - 36 inv. org.apache.rocketmq.store.timer.TimerWheel.getAllNum
+			0.9% - 5,693 ms - 87,091,200 inv. java.lang.ThreadLocal.get
+
+1.4% - 10,136 ms - 14,452 inv. org.apache.rocketmq.remoting.netty.RequestTask.run
+
+
+rocketmq任意延迟消息实现原理 - 天翼云
+https://www.ctyun.cn/developer/article/400725048053829
+
+TimerWheel
+是用mmap技术将文件映射成一个 7 * 24 * 3600 * 2 * 32 的数组，用于存放Slot的数据（并没有直接的关系，而且通过代码映射起来）
+能支持最长的14天定时任务（实际上还有其他地方限制，所以默认最多设置的是3天内的任意延迟消息）
+
+使用建议
+避免大量相同定时时刻的消息，一个broker节点不能超过10w。
+定时消息的实现逻辑需要先经过定时存储等待触发，定时时间到达后才会被投递给消费者。因此，如果将大量定时消息的定时时间设置为同一时刻，则到达该时刻后会有大量消息同时需要被处理，会造成系统压力过大，导致消息分发延迟，影响定时精度。
+
+弥补延时消息的不足，RocketMQ 基于时间轮算法实现了定时 ...			与前面的文章一致,
+https://cloud.tencent.com/developer/article/2196167
+
+
+RocketMQ 消息集成：多类型业务消息— 定时消息					看了一下, 这文章写得不错, 值得读两遍, running,--------------------------,
+https://zhuanlan.zhihu.com/p/552503528
+
+注意：定时消息的实现逻辑需要先经过定时存储等待触发，定时时间到达后才会被投递给消费者。
+因此，如果将大量定时消息的定时时间设置为同一时刻，则到达该时刻后会有大量消息同时需要被处理，会造成系统压力过大。
+所以一般建议尽量不要设置大量相同触发时刻的消息。
+
+以及我们现在用的, 性能会比较慢的做法,
+
+然后, 有没有官方的文档, 喵的, 这个 TimeMessageStore 的算法,
+
+rocketmq 有没有文档, 
+2.运行我对应的东东,
+
+2.1. 什么是时间轮算法?
+
+他这个流程, 代码是怎么样的呢? 跟一跟,
+
+TimeMessageStore,
+定时消息, 直接看定时消息即可, 应该可以过渡到那个东东的实现, 对着架构图和逻辑来研究代码,
+
+以及它里面的队列是长啥样呢? 印象中是有两种 LinkedListBlockingQueueu, 以及另外一种类型的 queue, 
+
+1.从 TIMER_TOPIC 拉到 enqueuePutQueue 的过程,
+TimerEnqueueGetService, 的实现相关分析,
+================================ TimerEnqueueGetService ================================
+	getServiceName -> {
+		配置文件中读取 + 当前类的 simpleName,
+	}
+
+	run() -> {
+		没停止,
+		只调了一个方法, 
+		TimerMessageStore.this.enqueue(0)
+		从字面意思来看, 应该是: 从队列拉数据,没拉到，就停止 100L * precisionMs / 1000 再进行拉取,
+		这个 TimerMessageStore.this.enqueue(0) 里面是什么东东?
+		{
+			在这个 enqueue 方法里面, 从 TOPIC=TIMER_TOPIC , 取 queueId=0 的 ConsumeQueue 出来,
+			TIMER_TOPIC = TopicValidator.SYSTEM_TOPIC_PREFIX + "wheel_timer";
+			即 rmq_sys_wheel_timer,
+
+			while (!enqueuePutQueue.offer(timerRequest, 3, TimeUnit.SECONDS)) { ... }
+				Inserts the specified element into the queue represented by this deque
+				插入一个元素到这个双边队列代表的队列里面,
+				(in other words, at the tail of this deque), waiting up to the
+				即写到这个双边队列的末尾,
+				specified wait time if necessary for space to become available.
+				如果需要的话, 等待特定的时间直到空间变得可行.
+
+		}
+		其从 messageStore 中, 根据 TIMER_TOPIC名称 + queueId, 获取消费队列, (数据是放在文件中, 从文件中查找)
+		如果消费队列中, 存在可以入列的元素, 则循环这些元素, 根据元素上存储的 offset, size 等, 把数据取出来, 放到 enqueuePutQueue 里面。
+	}
+
+TimerEnqueuePutService, 的实现相关分析, 
+================================ TimerEnqueuePutService ================================
+	getServiceName -> {
+		配置文件中读取 + 当前类的 simpleName,
+	}
+
+	fetchTimerRequests() -> 从 enqueuePutQueue 队列里面, 拉取数据,一口气拉了 10 个
+
+	putMessageToTimerWheel(TimerRequest req) -> 看方法名是, 把 message 放到 timerWheel 里面去, 
+		如果消息已经超时, 则直接将其放入到 dequeuePutQueue 里面去,
+		通过 doEnqueue 方法, 将其放到时间轮里面去,
+			1. 将数据写到 TimerLog 里面去, 用的是 MappedFile 的内存映射方式, 来写文件, 
+			2. 在时间轮里面, 写一条记录, timerWheel.putSlot()
+	
+	fetchAndPutTimerRequest() -> 调 fetchTimerRequests() 方法, 循环
+
+TimerDequeueGetService 的实现相关分析, 
+================================ TimerDequeueGetService ================================
+	getServiceName -> {
+		配置文件中读取 + 当前类的 simpleName,
+	}
+	public void run() {
+		......
+		关键方法就是这个,
+		TimerMessageStore.this.dequeue();
+			1. 从 timerWheel 中取得 slot,
+			Slot slot = timerWheel.getSlot(currReadTimeMs);
+			根据 slot 中的 lastPos, 调 timerLog.getWholeBuffer, 把 SelectMappedBufferResult 给获取出来,
+			最后放进 dequeueGetQueue 里面去,
+		......
+	}
+
+TimerDequeueGetMessageService 的实现相关分析, 
+================================ TimerDequeueGetMessageService ================================
+	getServiceName -> {
+		配置文件中读取 + 当前类的 simpleName,
+	}
+	public void run() {
+		......
+		从 dequeueGetQueue 里面拉取数据,  并放入 dequeuePutQueue 里面去,
+		......
+	}
+
+TimerDequeuePutMessageService 的实现相关分析, 
+================================ TimerDequeuePutMessageService ================================
+	getServiceName -> {
+		配置文件中读取 + 当前类的 simpleName,
+	}
+	public void run() {
+		......
+		没到时间的, 需要 roll 的, 就会调用 messageStore.putMessage(message);
+		看代码是重新放到 commitLog 里面去,
+			this.commitLog.asyncPutMessage(msg);
+		......
+	}
+
+正常消息是怎样的一个流程, 有没有源代码之类的, 看性能分析是分析不出来, 再看一看其它的文档,
+
+RocketMQ 的一条消息的流程,
+
+
+1
+1 << 1 = 10 = 2
+1 << 2 = 100 = 4
+01 | 10 = 11 = 3
+01 | 100 = 101 = 5
+即 needRoll, magic = 3,
+而要删除, magic = 5,
+
+doEnqueue 方法, 
+
+TimerLog 中的 MappedFileQueue, -> DefaultMappedFile, 用的内存文件映射的方式,
+
+
+queue有两种, DisruptorBlockingQueue, 以及 LinkedBlockingDeque,
+
+jdk1.8 的并发库,
+nio 的重新熟悉,
+
+
+搜索 rocketmq 消息发送流程
+
+1.
+RocketMQ 消息发送流程,				读 finish,
+https://zhuanlan.zhihu.com/p/428716982
+读完, 感觉一般般,
+
+
+2.
+图解RocketMQ消息发送和存储流程
+https://cloud.tencent.com/developer/article/1717385
+读完, 感觉一般般, 列出了一堆代码流程图, 但是可能没啥用,
+
+3.
+RocketMQ入门教程(三)：发送消息和消费消息 - CSDN博客
+https://blog.csdn.net/vbirdbest/article/details/112427125
+RocketMQ提供了三种方式来发送普通消息：可靠同步发送、可靠异步发送、单向发送。
+读完, 感觉一般般,
+
+4.
+RocketMQ—Producer（四）消息发送流程 - 知乎
+https://zhuanlan.zhihu.com/p/496111739
+读完, 感觉一般般,
+
+5.
+RocketMQ 发送消息 - 知乎
+https://zhuanlan.zhihu.com/p/361195668
+读完, 感觉一般般,
+
+6.
+https://zhuanlan.zhihu.com/p/412891890
+RocketMQ原理-消息发送流程 - 知乎
+读完, 感觉一般般, 不值得再次阅读,
+
+7.
+https://juejin.cn/post/7281889329584226319
+RocketMQ发送消息原理（含事务消息） - 掘金
+
+二、Broker端接收发送消息请求与处理流程
+broker这边入口是netty监听客户端消息的地方，在NettyServerHandler类
+
+一般般, 可以再读一遍, 喵的,
+
+
+8.
+https://rocketmq.apache.org/zh/docs/featureBehavior/01normalmessage
+普通消息发送 | RocketMQ
+
+https://rocketmq.apache.org/zh/docs/featureBehavior/04transactionmessage
+事务消息,
+
+9.
+https://zhuanlan.zhihu.com/p/262174109
+RocketMQ启动与消息发送过程分析 - 知乎
+读完, 感觉一般般, 不值得再次阅读,
+
+10.
+https://zhuanlan.zhihu.com/p/138652070
+RocketMQ同步消息、异步消息、单向消息详解 - 知乎
+读完, 感觉一般般, 不值得再次阅读,
+
+
+还有四个最佳实践, 这里面有: RocketMQ MQTT,
+
+
+11.
+https://zhuanlan.zhihu.com/p/390078066
+消息的存储-RocketMQ知识体系3
+
+
+
+

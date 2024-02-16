@@ -1,0 +1,517 @@
+https://cloud.tencent.com/developer/article/1378011
+
+分布式数据库MVCC技术探秘 (1)
+http://www.nosqlnotes.com/?s=mvcc
+
+http://www.nosqlnotes.com/page/2/
+
+
+回顾Bigtable的经典设计
+http://www.nosqlnotes.com/technotes/bigtable-keydesign/
+
+然后就跨入到 newsql,
+
+批量数据导入和更新，
+
+整理一个相关的 hbase 的东东,然后瞄瞄瞄,
+
+http://www.nosqlnotes.com/technotes/searchengine/lucene-invertedindex/
+
+在Windows环境下编译调试Hbase源码
+https://blog.csdn.net/cff603/article/details/82748287
+
+hbase 源码编译的东东,
+https://www.cnblogs.com/lancelot-zj/p/10386609.html
+
+-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005
+https://cloud.tencent.com/developer/article/1423067
+
+winutils
+https://blog.csdn.net/m0_37499059/article/details/79659945
+
+重新阅读:
+http://www.nosqlnotes.com/technotes/mvcc-snapshot-isolation/
+
+
+https://blog.xiaoxiaomo.com/2019/04/07/HBase-通过idea搭建源码阅读环境/
+
+hbase api 地址:
+https://hbase.apache.org/devapidocs/org/apache/hadoop/hbase/regionserver/wal/FSHLog.RingBufferEventHandler.html
+
+视频讲解的东东:
+https://yq.aliyun.com/articles/693379
+
+write skew,
+两个事务 T1,T2
+T1->V1
+T2->V2,
+
+并行执行,其将不会读到另外事务执行的值。
+
+WIKi中关于逻辑时钟的定义
+1.进程在事件发生前,先递增其内部的 counter，
+2.进程发送消息时,将内部的 counter 也放到消息中，
+3.接收消息时,收件人的 counter = max(自身的 counter, 收件人的counter), 并且 counter += 1
+
+MVCC事务机制：混合逻辑时钟,
+
+Serial Snapshot Isolation
+
+Cockroach的概念:
+事务ID:每个事务都有一个 ID，
+事务的状态:pending,aborted,committed
+事务的隔离级别:SI,SSI
+事务表:Transaction Table,
+
+读写冲突,但是有点明白了,
+
+写写冲突,明白了,有点悟了。
+
+阅读原理性的东东,再来阅读代码,
+
+一致性副本协议,
+事务协议,
+
+BigTable,其从 BigTable 中而来,
+
+那可能环境变量不会重新获取,
+
+阅读要点1:
+=============================================================
+数据在写入到Tablet之前先顺序写入到一个日志文件中。
+每一个Tablet Server上的多个Tablets共享同一个日志文件。
+数据成功被写入到日志文件之后，再写入到Tablet的Memtable(内存排序Map)中。
+当Memtable中的数据达到一定的大小之后Flush到GFS中成为SSTable文件。SSTable解释如下：
+=============================================================
+
+====================================
+Bigtable中的Minor Compaction过程，在HBase中称之为Flush。Bigtable经Minor Compaction之后生成的文件为SSTable，HBase中经Flush之后生成的文件为HFile。
+Bigtable中的Merge Compaction过程，对应于HBase中的Minor Compaction。
+Bigtable中的Major Compaction在HBase中也称之为Major Compaction。
+====================================
+
+子表,
+====================================
+HFile 的文件格式,以及启动加载优化,
+====================================
+
+术语:
+====================================
+Master			HBase 的 Master,
+RegionServer,		HBase 的数据服务节点。
+NameNode		HDFS 的 NameNode,
+DataNode		HDFS 的 DataNode,
+====================================
+
+1.数据模型
+1.1.RowKey,只能按 RowKey 进行查询,
+1.2.稀疏矩阵,
+1.3.Region,HBase中采用了”Range分区”，将Key的完整区间切割成一个个的”Key Range” ，每一个”Key Range”称之为一个Region
+1.4.KeyValue,
+1.5.HRegionInfo,
+1.6.查询的时候,如何来推呢?
+
+HBase MOB 特性,存储小文件用的,
+
+
+Master,如何来管理 Region,
+
+
+创建Connection,由 ConnectionFactory 提供的工具,
+CompletableFuture<AsyncConnection> createAsyncConnection(Configuration conf,
+                 User user);
+​
+Connection createConnection(Configuration conf, ExecutorService pool, User user)
+      throws IOException;
+
+写数据之前：创建数据表
+DDL操作的抽象接口 – Admin
+Admin定义了常规的DDL接口，列举几个典型的接口：
+void createNamespace(final NamespaceDescriptor descriptor) throws IOException;
+​
+void createTable(final HTableDescriptor desc, byte[][] splitKeys) throws IOException;
+​
+TableName[] listTableNames() throws IOException;
+
+预设合理的数据分片 – Region
+
+Master 如何来建表,
+
+hbase 的表是存储在 hbase:meta 里面,
+
+Procedure,来保证框架事务性,比如建表的过程中,进程挂了,
+
+Master分配Regions到各个RegionServers,
+通过 AssignmentManager 将 region 分配到 RegionServer 中。
+具体的分配计划，由 LoadBalancer 来提供。
+
+读到这里,
+http://www.nosqlnotes.com/technotes/hbase/hbase-overview-writeflow/
+
+
+一个Put可以理解成与某个RowKey关联的1个或多个KeyValue的集合
+
+一条数据
+{
+	Mobile1:13400006666
+	Mobile2:13500006666
+	StartTime:201803011300
+	Duration:666
+}
+RowKey:6666000431^201803011300
+生成两个 KeyValue
+[6666000431^201803011300->L:M:13500006666]
+[6666000431^201803011300->L:D:666]
+
+meta region,所在的 RegionServer,
+
+api 参考
+参考：https://www.tutorialspoint.com/hbase/hbase_create_data.htm
+
+
+客户端类入口：
+HTable
+	public void put(final Put put) throws IOException {
+	public void put(final List<Put> puts) throws IOException {
+服务端类入口：
+org/apache/hadoop/hbase/regionserver/RSRpcServices.java
+	public MutateResponse mutate(final RpcController rpcc, final MutateRequest request) throws ServiceException {
+		-> 这里面有 put,
+		region.put(put);
+			checkResources();
+				// 检查 memStore 的大小,
+			startRegionOperation(Operation.PUT);
+				lock.readLock();
+				coprocessorHost.postStartRegionOperation(op);
+			doBatchMutate(put);
+				->batchMutate,
+					->doMiniBatchMutate(batchOp);
+						WAL再写MemStore,
+
+						STEP 1. Try to acquire as many locks as we can and build mini-batch of operations with locked rows
+							步骤1:尽可以获取锁
+						STEP 2. Update mini batch of all operations in progress with  LATEST_TIMESTAMP timestamp
+					        We should record the timestamp only after we have acquired the rowLock,
+					        otherwise, newer puts/deletes are not guaranteed to have a newer timestamp
+							步骤2:更新 LATEST_TIMESTAMP 时间标记
+						STEP 3. Build WAL edit
+							步骤3:构建 WAL edit
+						STEP 4. Append the WALEdits to WAL and sync.
+							追加 WALEdits 到 WAL 并同步。
+							-> doWALAppend(WALEdit walEdit
+								......
+									->用了 RingBuffer,stampSequenceIdAndPublishToRingBuffer
+									RingBufferEventHandler,
+									Handler that is run by the disruptor ringbuffer consumer. 
+										ringbuffer 的消费者类。
+									Consumer is a SINGLE 'writer/appender' thread. 
+										消费者是单个 '写/追加' 线程
+									Appends edits and starts up sync runs. 
+										追加 edits,开始 sync.
+									Tries its best to batch up syncs. 
+										尽可能的批量同步.
+									There is no discernible benefit batching appends so we just append as they come in because it simplifies the below implementation. 
+										批量追加时,并没有明显的好处,因此,批量追加时,直接追加以简化实现。
+									See metrics for batching effectiveness (In measurement, at 100 concurrent handlers writing 1k, we are batching > 10 appends and 10 handler sync invocations for every actual dfsclient sync call; 
+									at 10 concurrent handlers, YMMV).
+										批量的一些统计数据(数字显示, 100 并发写 1k, 会变成 10个批量，10个同步写,10个并发。)
+
+									Herein, we have an array into which we store the sync futures as they come in. 
+										在这里面,用一个数组来接收传入的 sync future.
+									When we have a 'batch', we'll then pass what we have collected to a SyncRunner thread to do the filesystem sync. 
+										当收集形成一个 batch 时,将这个 batch 传给一个 SyncRunner 线程，以调用文件系统同步。
+									When it completes, it will then call SyncFuture.done(long, Throwable) on each of SyncFutures in the batch to release blocked Handler threads.
+										当同步完成后,其会调用 SyncFuture.done,以释放 block hander thread.
+
+									I've tried various effects to try and make latencies low while keeping throughput high. 
+										我使用用了各各自效果以达到低延迟的同时保存高吞吐量.
+									I've tried keeping a single Queue of SyncFutures in this class appending to its tail 
+									as the syncs coming and having sync runner threads poll off the head to 'finish' completed SyncFutures. 
+										在 SyncFuntures 中,使用一条队列,以接收同步请求,用 sync runner thread 来拉取.
+									I've tried linkedlist, and various from concurrent utils whether LinkedBlockingQueue or ArrayBlockingQueue, etc. 
+										尝试了 linkedlist, LinkedBlockingQueue, ArrayBlockingQueue.
+									The more points of synchronization, the more 'work' (according to 'perf stats') that has to be done; 
+									small increases in stall percentages seem to have a big impact on throughput/latencies. 
+						// Complete mvcc for all but last writeEntry (for replay case)
+							MultiVersionConcurrencyControl mvcc,
+							Manages the read/write consistency. 
+							管理读写一致性.
+							This provides an interface for readers to determine what entries to ignore, 
+								给 reader 提供接口，以判断忽略哪个 entry.
+							and a mechanism for writers to obtain new write numbers, 
+								提供给 writer 获取新写入的 number.
+							then "commit" the new writes for readers to read (thus forming atomic transactions).
+								提供 writer 给 reader 读取。
+						// STEP 5. Write back to memStore
+						// NOTE: writeEntry can be null here
+							写入到 memStore 中,
+							writeEntry = batchOp.writeMiniBatchOperationsToMemStore(miniBatchOp, writeEntry);
+							->protected void writeMiniBatchOperationsToMemStore(
+								final MiniBatchOperationInProgress<Mutation> miniBatchOp, final long writeNumber)
+								throws IOException {
+								// We need to update the sequence id for following reasons.
+									由于以下的原因,需要更新 sequence id,
+								// 1) If the op is in replay mode, FSWALEntry#stampRegionSequenceId won't stamp sequence id.
+									如果操作是重放 mode, FSWALEntry#stampRegionSequenceId 不会更新 sequence id.
+								// 2) If no WAL, FSWALEntry won't be used
+									如果没有 WAL, FSWALEntry 不会用到.
+								// we use durability of the original mutation for the mutation passed by CP.
+									使用传过来的 mutation 的原先保存的 mutation,
+
+									->applyFamilyMapToMemStore,
+										->region.applyToMemStore(region.getStore(family), cells, false, memstoreAccounting);
+											->region.getStore(family)
+												org/apache/hadoop/hbase/regionserver/AbstractMemStore.java
+												public void add(Cell cell, MemStoreSizing memstoreSizing) {
+													......
+													/*
+													Internal version of add() that doesn't clone Cells with the allocator, and doesn't take the lock.
+													Callers should ensure they already have the read lock taken
+													内部版本的 add 没有复制 cells,也没有获取锁。调用方必须保证已经拥有读锁.
+													*/
+													->private void internalAdd(final Cell toAdd, final boolean mslabUsed, MemStoreSizing memstoreSizing) {
+														->active.add(toAdd, mslabUsed, memstoreSizing);
+															->MutableSegment.add,
+																->MemStoreSizing,	看到了这个 MemStoreSizing 的注释,====================
+																api 地址:https://hbase.apache.org/devapidocs/org/apache/hadoop/hbase/regionserver/MemStoreSizing.html
+								--------------------------------------------------------------------
+
+// Appends and syncs are coming in order off the ringbuffer. We depend on this fact. 
+	sync 从 ringBuffer 中顺序而来.
+We'll
+// add appends to dfsclient as they come in. Batching appends doesn't give any significant
+	写入 dfsclient 的顺序与进入的顺序一致。
+// benefit on measurement. 
+	批量追加并没有明显的好处.
+Handler sync calls we will batch up. 
+	将会批量调用 sync call.
+If we get an exception
+// appending an edit, we fail all subsequent appends and syncs with the same exception until
+// the WAL is reset. 
+	当追加 edit 发生异常，这一子序列的追加与同步将会以相同的异常而失败.
+It is important that we not short-circuit and exit early this method.
+// It is important that we always go through the attainSafePoint on the end. 
+	最终，总会得到一个 attainSafePoint 的状态.
+Another thread,
+// the log roller may be waiting on a signal from us here and will just hang without it.
+	日志写入方将会挂起，等待 signal,ringBuffer,
+
+										
+									The below model where we have an array into which we stash the syncs and then hand them off to the sync thread seemed like a decent compromise. 
+										采用数组,来存储 stash sync,是一个妥协.
+									See HBASE-8755 for more detail.
+
+									SyncFuture,
+									A Future on a filesystem sync call. 
+										调用文件系统的 sync,返回 Future.
+									It given to a client or 'Handler' for it to wait on till the sync completes.
+										供 client 或 handler 调用,调用方等待，直到 sync 完成.其内部的实现就是 wait.
+								......
+
+			closeRegionOperation(Operation.PUT);
+
+	public MultiResponse multi(final RpcController rpcc, final MultiRequest request) throws ServiceException {
+
+	开始瞄写的流程,
+
+org/apache/hadoop/hbase/regionserver/MultiVersionConcurrencyControl.java
+	public WriteEntry begin(Runnable action) {,
+
+	public boolean complete(WriteEntry writeEntry) {
+		Mark the {@link WriteEntry} as complete and advance the read point as much as possible.
+		将 writeEntry 标记为完成,并尽可能地往前挪动读指针.
+		Call this even if the write has FAILED (AFTER backing out the write transaction
+		changes completely) so we can clean up the outstanding transaction.
+		即使写失败，也调用这个方法，这样就可以清理未完成的事务。
+
+		How much is the read point advanced?
+		读指针该如何前移?
+
+		Let S be the set of all write numbers that are completed. Set the read point to the highest numbered write of S.
+		@return true if e is visible to MVCC readers (that is, readpoint >= e.writeNumber)
+		假设 S 是写合集.则将读指针指向 S 中的最大值.
+	void waitForRead(WriteEntry e) {
+		等待,直到读指针比传入的 写值还要大.
+
+
+还有一个 MVCC,
+private final MultiVersionConcurrencyControl mvcc = new MultiVersionConcurrencyControl();
+
+
+https://hbase.apache.org/devapidocs/org/apache/hadoop/hbase/regionserver/wal/SyncFuture.html
+
+hbase 源码编译的东东,
+https://www.cnblogs.com/lancelot-zj/p/10386609.html
+
+0.hbase,		finish,
+1.cygwin,		finish,
+2.hadoop,		finish,
+
+2.环境变量,
+HADOOP_HOME=E:\hongjinqiu\soft\hadoop\hadoop-2.7.7
+HADOOP_USER_NAME=cxx
+
+path 添加
+D:\cygwin64\bin
+%HADOOP_HOME%\bin
+%HADOOP_HOME%\sbin
+
+修改 JAVA_HOME=D:\program files\Java\jdk1.8.0_144
+
+然后运行 mvn package -DskipTests assembly:single
+
+在 E:\hongjinqiu\soft\hbase\hbase-2.0.5\hbase-assembly\target 目录下即可生成 hbase-2.0.5-bin.tar.gz
+
+winutils
+https://blog.csdn.net/m0_37499059/article/details/79659945
+
+视频看到 15 分钟,果然明白多了,
+
+
+看到了 38 分钟,
+
+跑起来?
+
+将 这个东东跑起来，并在 idea 中植入断点，
+
+${hbase.tmp.dir}/local
+
+${hbase.tmp.dir}/zookeeper
+
+create 'test', 'f1'
+
+hbase(main):003:0> put 'test', 'row1', 'f1:a', 'value1'
+0 row(s) in 0.0850 seconds
+
+hbase(main):004:0> put 'test', 'row2', 'f1:b', 'value2'
+0 row(s) in 0.0110 seconds
+
+hbase(main):005:0> put 'test', 'row3', 'f1:c', 'value3'
+0 row(s) in 0.0100 seconds
+
+
+list 'test'
+
+scan 'test'
+
+get 'test', 'row1'
+
+
+debug 的方式，在 idea 中，启动 HMaster,
+停止，用
+E:\hongjinqiu\soft\hbase\hbase-2.0.5-bin.my\hbase-2.0.5\bin\
+stop-hbase.cmd
+
+跟着流程走,
+
+看到了 17:15 分,重新看视频,继续瞄东东,
+
+哪些是服务端，哪些是客户端，
+
+看到了 HRegion 里面的这个方法,
+	private boolean nextInternal(List<Cell> results, ScannerContext scannerContext) throws IOException {
+
+如何来组织并运行的?
+
+
+org/apache/hadoop/hbase/regionserver/RSRpcServices.java
+
+用到的技术与类的关系梳理,
+
+读到了 http://www.nosqlnotes.com/technotes/hbase/hbase-read/
+更明白了一些,
+
+开始开发一个仿 HBase 的系统,
+
+1.哈希方式,	如果是按 uuid 生成一个 key,最终还是要数据迁移,
+2.按数据范围分布,	这种方式可以考虑,
+3.按数据量分布,		感觉按 key 查询比较不方便,
+4.一致性哈希,		一致性哈希的优点在于可以任意动态添加、删除节点，每次添加、删除一个节点仅影响一致性哈希环上相邻的节点,
+
+某个一致性哈希算法,并且增加了虚节点的方式,
+https://blog.csdn.net/u012422440/article/details/93917223
+
+方差,
+标准差,
+越小越好,
+
+NATIVE_HASH,
+
+Ketama一致性哈希算法整理
+https://blog.csdn.net/sdausxc/article/details/52059608
+
+一致性哈希算法之Ketama算法
+https://www.jianshu.com/p/f78a31725582
+
+
+
+____^^^^____^^^^
+
+=====================================
+byte[] digest = computeMd5(server.getSocketAddress().toString() + VIRTUAL_NODE_SUFFIX + "0");
+allNodes.put(1, node);
+allNodes.put(2, node);
+allNodes.put(3, node);
+allNodes.put(4, node);
+=====================================
+byte[] digest = computeMd5(server.getSocketAddress().toString() + VIRTUAL_NODE_SUFFIX + "1");
+allNodes.put(1, node);
+allNodes.put(2, node);
+allNodes.put(3, node);
+allNodes.put(4, node);
+=====================================
+byte[] digest = computeMd5(server.getSocketAddress().toString() + VIRTUAL_NODE_SUFFIX + "2");
+allNodes.put(1, node);
+allNodes.put(2, node);
+allNodes.put(3, node);
+allNodes.put(4, node);
+
+我还想试一试，这个哗然
+
+
+1___2___3___4___......___1024___......___
+
+
+那像这种算法，能不能搞定一半呢?
+
+会插入到 4 个地方，因此，就会把临近 4 个节点的数据给同步过来，
+
+测一下是不是真的串起来，
+
+1.还是要做成 master-slave 模式,
+2.照 HBase 的方式,
+
+HMaster, 有一个 MemStore, 那 Zookeeper 呢?
+
+其是找到 RegionServer,一个 RegionServer,有一个 MemStore,
+
+
+
+===================== 开发相关begin =========================
+protobuf
+https://www.cnblogs.com/liugh/p/7505533.html
+
+
+其是用 java nio 自己实现了，
+那个 hadoop 协议是如何来做的？
+
+1.网络传输，直接用 protobuf 行不，
+2.用类名，
+HBaseNetProtocol
+{
+	className:"getRegion",
+	content:"asdfasdfasdf"
+}
+
+
+因此，我可以使用一个简单的定长网络读取协议即可，
+netty中是否已经有了这种简单的读取的东东，应该也是用，可是用 nio 的话，
+用进 netty, 看能否成功，
+天然支持 Google Protobuf,
+
+com.hbasetest.proto.HBaseNetProtocol
+===================== 开发相关end =========================
+
+
+
+

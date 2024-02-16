@@ -1,0 +1,443 @@
+https://www.cnblogs.com/yjmyzz/p/how-to-remote-debug-hadoop-with-eclipse-and-intellij-idea.html
+
+eclipse/intellij idea 远程调试hadoop 2.6.0
+
+
+以这一篇为准,
+https://blog.csdn.net/happyanger6/article/details/45289271
+hadoop学习(六)--------eclipse远程调试
+
+
+http://www.eclipse.org/jetty/documentation/9.3.x/enable-remote-debugging.html
+Remote Debugging
+
+
+https://blog.csdn.net/skywalker_only/article/details/25539115
+Hadoop学习之配置Eclipse远程调试Hadoop
+
+
+如何来 debug hdfs,
+在对应的启动中,添加,
+在bin/hdfs 这个文件中,添加
+HADOOP_OPTS="$HADOOP_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8103"
+然后在 eclipse 中添加 remote java application 进行debug,
+
+eclipse 中新建 remote debug,
+
+
+NameNode 相关的东东,
+org.apache.hadoop.hdfs.server.namenode.ha
+org.apache.hadoop.hdfs.server.namenode.metrics
+org.apache.hadoop.hdfs.server.namenode.snapshot
+org.apache.hadoop.hdfs.server.namenode.startupprogress
+org.apache.hadoop.hdfs.server.namenode.web.resources
+AclFeature.java
+AclStorage.java
+AclTransformation.java
+AuditLogger.java
+BackupImage.java
+BackupJournalManager.java
+BackupNode.java					
+	周期性地从 active node 下载 iamge 和 edits ,合并,将最新的 image 上传到 active.
+BackupState.java
+CachedBlock.java					finish,
+	顾名思义,cache block,内部有一个变量 triplets,三个 object,三个 object 的存,
+CacheManager.java					finish,
+	cache block 到 datanode 的映射,一闪而过,
+CachePool.java						finish,
+	wwww,
+	NameNode 所管理的一系列缓存资源,
+CancelDelegationTokenServlet.java
+CheckableNameNodeResource.java
+CheckpointConf.java					finish,
+	一些用到的变量集合,
+Checkpointer.java					finish,
+	对 HDFS metadata 进行周期的 checkpoints,
+	一个线程,周期性的 sleep,再运行
+	触发点是:时间,或者是 edit file 过大,
+CheckpointFaultInjector.java				finish,
+	一闪而过,
+CheckpointSignature.java				一些字段值,
+	wwww,checkpoint transaction 的签名标识类.
+ClusterJspHelper.java
+Content.java						finish,
+	枚举类,文件,目录,符号链接,
+ContentSummaryComputationContext.java			finish,
+	保存对枚举类的相关引用,
+ContentSummaryServlet.java
+DfsServlet.java
+DirectoryWithQuotaFeature.java				finish,
+	wwww,
+EditLogBackupInputStream.java				finish,
+	继承自 EditLogInputStream,将 HDFS meta-data 写到 backup node 上.
+EditLogBackupOutputStream.java				finish,
+	继承自 EditLogOutputStream,将 stream Edit 写到 backup node 上.
+EditLogFileInputStream.java				finish,
+	从文件读取,或从 URL 中读取
+EditLogFileOutputStream.java				finish,
+	finish,
+EditLogInputException.java
+EditLogInputStream.java					finish,
+EditLogOutputStream.java				finish,
+	将 EditLog 持久存储,
+EditsDoubleBuffer.java					finish,
+	两个变量用来切换,
+EncryptionFaultInjector.java
+EncryptionZoneManager.java
+FileChecksumServlets.java				finish,
+	Servlets for file checksum
+FileDataServlet.java					finish,
+	Redirect queries about the hosted filesystem to an appropriate datanode.
+FileJournalManager.java					finish,
+	edit files 写到存储的日志管理,
+FileUnderConstructionFeature.java			finish,
+	pass,
+FsckServlet.java					finish,
+FSClusterStats.java					finish,接口,顾名思义,
+FSDirectory.java					finish,一闪而过,大致了解,
+	FSDirectory 与 FSNamesystem 都是用来管理 namespace 的状态的,
+	FSDirectory 是纯内存数据结构,而 FSNamesystem 将所有的操作持久到磁盘上.
+FSEditLog.java						finish,
+	editLog 的状态变更,
+	non-HA的状态:
+		UNITIALIZED->IN_SEGMENT,BETWEEN_LOG_SEGMENTS
+	HA setup:
+		UNINITIALIZED->OPEN_FOR_READING,BETWEEN_LOG_SEGMENTS,IN_SEGMENT
+	public void logSync() {
+	// 同步这个线程所做的所有修改,
+	// 这个方法的内部并发设计为:
+	//	1.Log item 同步写到 内存 buffer中,每个 Log item 都会赋一个 transaction ID
+	//	2.当某个线程想要同步它自己的所有修改,logSync 用一个 ThreadLocal 的 transaction ID 来决定哪个 edit number 来同步.
+	//	3.volatile isSyncRunning 变量,用来标识是否正在 sync 中.
+	// 每个 edit log 都实现为双重缓存,因此,内存写和磁盘写可以并行执行.
+	// 每次同步都会用 3 个步骤,
+	// 1.用 synchronized 包住 double-buffer,并设置 isSyncRunning 标识,
+	// 2.不 synchronized ,将所有的数据刷到存储上
+	// 3.用 synchronized 包住,对 isSyncRunning 进行赋值, notify
+	// 步骤 2 不用 synchronized,使得其它的线程当 sync 正在进行时,也可以写入 memory buffer 中,
+	// 因为这个方法未全部同步,因此,不能 concurrent 的操作,要用 synchronized 包住,同时,调用 waitForSyncToFinish(),
+	// bufReady,bufCurrent,
+FSEditLogLoader.java					finish,
+	// 都只是一些数据库特性而已,
+	从 EditLogInputStream 中读取 Op,根据 code,应用到内存的数据结构里面,
+FSEditLogOp.java					finish,
+	从 inputStream 中读取 ops,通过 Reader#readOp() 来初始化,
+FSEditLogOpCodes.java					finish,
+	Op codes for edits file,
+	类似于这种:
+	OP_ADD                        ((byte)  0),
+	OP_RENAME_OLD                 ((byte)  1), // deprecated operation
+FSImage.java						一闪而过,
+	fsimage文件其实是Hadoop文件系统元数据的一个永久性的检查点，其中包含Hadoop文件系统中的所有目录和文件idnode的序列化信息,
+	处理 checkpointing 和 namespace edit 的日志处理,
+	FSImageSaver,保存 FSImage 的单独线程,
+FSImageCompression.java
+FSImageFormat.java					finish,
+	包含读写磁盘上 FSImage 的内部类实现,
+	FSImage 的格式:
+FSImageFormatPBINode.java				finish,
+	
+FSImageFormatProtobuf.java				finish,
+	用 protobuf 的格式来读写 fsimage,
+FSImagePreTransactionalStorageInspector.java		finish,
+	检查 FSImage storage directory 格式,需要有以下的数据文件:
+	fsimage,
+	fsimage.ckpt,
+	edits,
+	edits.new,
+FSImageSerialization.java				finish,
+	对 FSImage 的各片文件进行序列化,很多成员变量是 public 类型,以方便 Offline Image Viewer 查看,
+FSImageStorageInspector.java				finish,
+	抽象类,一闪而过,
+FSImageTransactionalStorageInspector.java		finish,
+	一闪而过,读取 FSImage,
+FSImageUtil.java					finish,
+	wwww,
+FSNamesystem.java					finish,类太长了,
+	对 DataNode 做记账工作,
+	1.合法的 fsname 与 blocklist 的映射,
+	2.保存所有合法的 blocks,
+	3.block -> machinelist 的映射,
+	4.machine -> blocklist 的映射,
+	5.machine 的更新心跳的缓存,
+FSNamesystemLock.java
+FSPermissionChecker.java
+GetDelegationTokenServlet.java
+HdfsAuditLogger.java
+ImageServlet.java
+INode.java						finish,
+	内存节点相关,
+INodeAttributes.java					finish,
+INodeDirectory.java					finish,
+INodeDirectoryAttributes.java				finish,
+INodeFile.java						finish,
+INodeFileAttributes.java				finish,
+INodeId.java						finish,用来标识 INode 用的,
+INodeMap.java						finish,
+INodeReference.java					finish,
+	INode 的匿名引用,跟 Linux 下的文件引用类似,
+	创建快照,重命名之类的,
+	主要是三个类是干嘛的?
+	WithCount:拥有引用数的引用,
+	WithName:拥有 name 的引用,
+	DstReference:在 rename 之前,记录下目标子树的 snapshot,
+	对 moved/renamed files/directories 的操作,如果最新快照在 dstSnapshot 之后,那么,相关操作就会记录在 latest snapshot 中.
+	否则,修改将会记录在 rename 的 src 上.
+INodesInPath.java					finish,
+	从 a given path 中包含 INodes information.
+	从 root 到根的 INode 集合.
+INodeSymlink.java					finish,
+INodeWithAdditionalFields.java				finish,
+	带额外字段的 inode,例如:id,name,permission,access time,modification time
+InotifyFSEditLogOpTranslator.java
+JournalManager.java					finish,
+	管理存储 edit log 的单一 place,每个存储实际上都是调用这个类,
+JournalSet.java						finish,
+	实现 JournalManager,管理一组日志,FSEditLog 会调用这个类,
+	wwww,有点明白了,
+LeaseExpiredException.java
+LeaseManager.java				大概明白了,
+	写某个文件的租约管理,
+	租约恢复算法,
+	1.Namenode检索租约信息,
+	2.对租约中的每个文件f,对 f 的最后一个 block b,
+	2.1.取得包含 b 的 datanode 列表,
+	2.2.设其中的某个 datanode 为主 datanode p,
+	
+	2.3.p 获取 namenode 生成的 stmap,
+	2.4.p 从每个 datanode 取得 block info,
+	2.5.p 计算最小的 block length,
+	2.6.p 更新所有的 datanodes,赋 generation stamp 和 minimum block length,
+	2.7.p ack namenode,更新结果
+
+	2.8.Namenode 更新 BlockInfo,
+	2.9.Namenode 从租约中删除 f,在所有文件被删除后,删除所有的 lease,
+	2.10.Namenode 将修改提交给 editlog,
+
+	boolean completed = fsnamesystem.internalReleaseLease(oldest, p,
+		finish,
+
+	checkLeases 方法,由 Monitor.run 周期性的调用,
+	遍历,调用 FSNamesystem.internalReleaseLease,
+ListPathsServlet.java
+LogsPurgeable.java
+MetaRecoveryContext.java
+NameCache.java
+NameNode.java					finish,
+NamenodeFsck.java				finish,大体了解,
+	检查文件和目录,如果在 DataNode 上已经丢失,则将其放入 /lost+found 目录,
+	找出未 replicate 或者 超出 replicate 的文件,并且可以打印出一些统计信息出来.
+	递归地检查目录,
+	void check(String parent, HdfsFileStatus file, Result res) throws IOException {
+		检查目录,
+		检查符号链接,
+		检查 file ,获取 LocatedBlocks,统计各种信息,
+NameNodeHttpServer.java				处理各种 http 请求用的,
+	封装了 http server 的启动,HttpServer2 (封装了 jetty),
+	void start() throws IOException {,	阅读到了这个方法,
+	有用的方法为:
+	private static void setupServlets(HttpServer2 httpServer, Configuration conf) {
+NamenodeJspHelper.java				finish,
+	传一个对象进来,生成各种 html 标记+对象内容的方法,
+NameNodeLayoutVersion.java			一闪而过,
+NameNodeMXBean.java				接口,
+NameNodeResourceChecker.java			检查 NameNode 空间是否够用用的,大体明白,
+NameNodeResourcePolicy.java			检查 resource 是否够用,
+NameNodeRpcServer.java				处理 NameNode 的所有 RPC 请求,finish,
+	finish,
+NameNodeStatusMXBean.java			接口,一闪而过,
+	finish,
+Namesystem.java					接口,一闪而过,
+	finish,
+NNConf.java					简单的数据结构,一闪而过,
+	finish,
+NNStorage.java					一闪而过,
+	NameNode 管理 StorageDirectory 用的,
+NNStorageRetentionManager.java			一闪而过,
+	检查 storage directory 用的,		
+NNUpgradeUtil.java
+NotReplicatedYetException.java
+Quota.java
+RedundantEditLogInputStream.java
+RenewDelegationTokenServlet.java
+RetryStartFileException.java
+SafeMode.java					finish,接口,
+SafeModeException.java				finish,简单的异常类,
+SaveNamespaceCancelledException.java
+SaveNamespaceContext.java
+SecondaryNameNode.java				finish,一闪而过,
+SecondaryNameNodeInfoMXBean.java
+SequentialBlockIdGenerator.java			finish,
+SerialNumberManager.java
+StartupProgressServlet.java
+StreamFile.java					finish,
+StreamLimiter.java				finish,接口允许读取多少流,
+TransferFsImage.java				finish,
+UnsupportedActionException.java
+VersionInfoMXBean.java
+XAttrFeature.java
+XAttrPermissionFilter.java
+XAttrStorage.java
+
+
+
+
+
+DataNode 相关的内容,
+org/apache/hadoop/hdfs/server/datanode/fsdataset
+org/apache/hadoop/hdfs/server/datanode/metrics
+org/apache/hadoop/hdfs/server/datanode/web/resources
+BlockMetadataHeader.java			finish,
+	大致明白了,
+BlockPoolManager.java				finish,
+	管理 BPOfferService,创建,删除,开始,停止,关闭,
+	方法比较短,秒懂,
+	.java			finish,不细究,
+	检查 block pool 中的 files,避免被破坏,
+	assignInitialVerificationTimes:
+	1.读取当前和先前的 log files,若其在上个检查周期内已被扫描,将其标识为已处理.
+	2.将最近扫描的 log record, 拷贝到 current file.
+	3.如果进程被打断,则 return false.
+BlockPoolSliceStorage.java			finish,
+	1.管理一组 BlockPoolSlices 的 storage,这组 BlockPoolSlices 在这个 datanode 上共享一个 block pool id.
+	2.格式化一个 new block pool storage
+	3.恢复一个 storage state 到 consistent state
+	4.block pool 升级的时候,打一个快照
+	5.回滚某个 block pool 到某个快照
+	6.删除 snapshot 来释放存储空间
+BlockReceiver.java
+BlockSender.java				finish,不是很明白,顾名思义,
+BPOfferService.java				finish,
+	对 NameNode 发送心跳用的,
+	没有复杂的业务,搞定,
+BPServiceActor.java				finish,
+	wwww,
+	一个线程,
+	1.向 namenode 发送 Pre-registration handshake
+	2.向 namenode Registration
+	3.向 namenode 发送 periodic heartbeats
+	4.执行从 namenode 返回的 command
+CachingStrategy.java				finish,
+
+ChunkChecksum.java				finish,
+	两个字段的类,
+DataBlockScanner.java				finish,
+	扫描 block pool 中的 block,
+DataNode.java					finish,
+	管理 DFS block 的,
+	datanode 存储一系列的 named blocks,
+	datanode 维护了一个表,block-> stream of bytes (of BLOCK_SIZE or less)
+	datanode 维护了一个 server socket,使得 client 或其它的 datanode 可以读写数据,
+DataNodeFaultInjector.java			finish,
+	失败注入器,
+DatanodeJspHelper.java				finish,
+	拼 html 用的,
+DataNodeLayoutVersion.java			finish,没什么内容,
+	finish,
+DataNodeMXBean.java				finish,JMX management interface for data node information,
+	wwww,
+DatanodeUtil.java				finish,Datanode 的 util 类,
+	wwww,
+DataStorage.java				finish,
+	保存 datanode information 的类,
+	private final String storageID;
+	private final State state;
+	private final StorageType storageType;
+	storage in datanode 的相关信息,
+DataXceiver.java				finish,
+	处理输入输出流的 Thread,
+DataXceiverServer.java				finish,
+	用来接收或者发送 block of data,在 run 里面,调用 DataXceiver,
+DirectoryScanner.java				finish,
+	周期性的扫描 data directory 和 block metadata 文件.
+	扫描磁盘和内存中的文件差异,
+DNConf.java					finish,
+	封装 DataNode 启动时的配置信息,
+FinalizedReplica.java				finish,
+	简单的类继承,
+Replica.java					finish,
+	接口,
+ReplicaAlreadyExistsException.java		finish,
+	异常,
+ReplicaBeingWritten.java			finish,
+	简单的类实现,
+ReplicaInfo.java				finish,
+	datanode 用来维护副本信息的,
+ReplicaInPipeline.java				finish,
+	这个类,定义了一个管道的副本,
+	包含一个 dfs client 写的持久副本,或 datanode 复制的临时副本,或者平衡的策略而复制
+ReplicaInPipelineInterface.java			finish,接口,
+ReplicaNotFoundException.java			finish,异常,
+ReplicaUnderRecovery.java			finish,
+	实现了一个 block 恢复过程中的副本,
+	其有一个 recovery id,由 generation stamp 生成,
+	recovery id 较大的值,可以抢占 recovery id 较小的值.
+ReplicaWaitingToBeRecovered.java		finish,
+	一个等待恢复的副本,datanode 重启之后,rbw 目录下的副本将被加载为:等待恢复的副本,
+	[等待恢复的副本]不提供读取,不参与管道恢复.
+	如果客户端持续写,其将会过期,或者被租约恢复.
+SecureDataNodeStarter.java			finish,
+ShortCircuitRegistry.java			running,-------------------------,
+	短电路注册,(移动计算比移动数据性能高,通过unix socket 来实现本地读)
+	管理 datanode 上的客户端短电路内存段,
+	DFSClient 向 datanode 请求共享内存段.
+	ShortCircuitRegistry 生成并管理这些段,每段都有一个随机生成的 128 位ID来标识,
+	每段包含了若干槽点.
+	在执行一个短电路读之前, DFSClient 向 datanode 发送 REQUEST_SHORT_CIRCUIT_FDS 操作请求.
+	在这个操作中,DFSClient 发送了共享内存段id,作为与这个副本的连接信息.
+	以及段的 slot number. slot总是由客户端分配。
+	Slot用来追踪(client block 以及 datanode block)的状态,
+	当 datanode mlock 一个block, block 上的 slot 将标识为 anchorable.
+	anchorable block 可安全的读取,不用校验checksum,可实现零拷贝。
+	当 DN munlock a block,需要等待 client 读取完成.
+	munlock 的时候,会同时将 slot 给标识为 unanchorable.
+StorageLocation.java				finish,顾名思义,
+
+
+父层目录的相关内容,				running,------------------,
+
+
+BlockMissingException.java
+BlockReader.java
+BlockReaderFactory.java
+BlockReaderLocal.java
+BlockReaderLocalLegacy.java
+BlockReaderUtil.java
+BlockStorageLocationUtil.java
+ClientContext.java
+CorruptFileBlockIterator.java
+DeprecatedUTF8.java
+DFSClient.java						running,-----------------------------------,
+	/* 对每个配置的 local interface,返回其 socket addresses.
+
+	*/
+	getLocalInterfaceAddrs,
+DFSClientFaultInjector.java
+DFSConfigKeys.java
+DFSHedgedReadMetrics.java
+DFSInotifyEventInputStream.java
+DFSInputStream.java
+DFSOutputStream.java
+DFSUtil.java
+DistributedFileSystem.java
+ExtendedBlockId.java
+HAUtil.java
+HdfsConfiguration.java
+HDFSPolicyProvider.java
+LeaseRenewer.java
+NameNodeProxies.java
+PeerCache.java
+RemoteBlockReader.java
+RemoteBlockReader2.java
+RemotePeerFactory.java
+StorageType.java
+UnknownCipherSuiteException.java
+UnknownCryptoProtocolVersionException.java
+XAttrHelper.java
+
+
+
+
+
+
+

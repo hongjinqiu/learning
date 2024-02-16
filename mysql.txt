@@ -1,0 +1,10 @@
+https://blog.csdn.net/adminpd/article/details/122910606
+
+MySQL没主键插入过程,
+https://www.cnblogs.com/frankcui/p/15226301.html
+
+聚簇索引,
+
+
+
+

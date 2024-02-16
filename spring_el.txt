@@ -1,0 +1,128 @@
+单号转义:
+&apos;	-> '
+&amp;	-> &
+&lt;	-> <
+&gt;	-> >
+&quot;	-> "
+&copy;	-> ©	// 版权符
+&reg;	-> ®	// 注册符
+
+
+
+Spring Expression Language Guide
+
+
+http://www.baeldung.com/spring-expression-language
+
+
+以 # 开头,格式类似于:	#{${someProperty} + 2}
+
+
+"#{someBean.someProperty != null ? someBean.someProperty : 'default'}"
+
+
+用 matches 来匹配正则表达式,#{'100' matches '\\d+'},
+
+
+访问 List 和 Map, @Value("#{workerHolder.salaryByWorkers['John']}")
+
+@Value("#{workerHolder.workers[0]}")
+
+在 xml 中使用:
+<property name="horsePower" value="#{engine.horsePower}" />
+
+然后从 spring getBean 并进行值的填写,
+
+ApplicationContext cotnext = new ClassPathXmlApplicationContext("applicationContext.xml");
+SpelOperators spelOperators = (SpelOperators)context.getBean("spelOperators");
+
+
+4. Parsing Expressions Programmatically
+使用 SpelExpressionParser, 不用再用#,{},
+#{1 + 1}	->	1 + 1
+
+
+ExpressionParser expressionParser = new SpelExpressionParser();
+Expression expression = expressionParser.parseExpression("'Any string'");
+String result = (String)expression.getValue();
+
+
+Expression expression = expressionParser.parseExpression("'Any string'.bytes");
+byte[] result = (byte[]) expression.getValue();
+
+Expression expression = expressionParser.parseExpression("'Any string'.replace(\" \", \"\").length()");
+Integer result = (Integer) expression.getValue();
+
+如果不想转值,使用
+Integer result = expression.getValue(Integer.class);
+
+最常用的是,设一个 object, 从 object 中来取值,
+
+Car car = new Car();
+car.setMake("Good manufacturer");
+
+ExpressionParser expressionParser = new SpelExpressionParser();
+Expression expression = expressionParser.parseExpression("model");
+
+EvaluationContext context = new StandardEvaluationContext(car);
+String result = (String)expression.getValue(context);
+
+StandardEvaluationContext 用于不变的 object, 如果经常改变,直接从 car 中取值,
+
+Expression expression = expressionParser.parseExpression("model");
+String result = (String) expression.getValue(car);
+
+
+4.2. Using ExpressionParser to Set a Value
+
+StandardEvaluationContext context = new StandardEvaluationContext(carPark);
+
+expressionParser.parseExpression("cars[0].model").setValue(context, "Other model");
+
+还是要使用一个嵌套的 执行环境,
+
+需要生成一个 uuid,来做一遍,不错,就是这样,
+
+
+
+
+
+java 中的 spring el,
+
+String expression = "result['name']";
+// result.name 报错,
+// #result['name'] 报错,
+// age 正确
+
+private static class Test {
+	private Map<String, Object> result;
+	public Map<String, Object> getResult() {return result;}
+	public void setResult(Map<String, Object> result) {this.result = result;}
+}
+
+Map<String, Object> nestEnv = new HashMap<>();
+nestEnv.put("name", "testMe");
+test.setResult(nestEnv);
+
+如果传入的是 map, 那么,需要变成 {'testP': 'test1'},那么表达式要写成:['testP'],不能直接写 testP,不然会报错,
+
+
+如果在 js 中用 [] 可以吗?
+
+js 中的 [] 语法测试,
+
+在js里面, #printConfigTemplate['itemInfoChecked'] 也是正确的,
+
+但是在 spring el 里面,
+对象可以用 [] 来访问属性,也可以用 .
+但是 map,只能用 [] 来访问属性,不能用.
+
+js 里面都是对象,可以用 . 和 []
+
+因此,需要全部用对象,
+
+因此,只能用 object 了,
+
+
+
+

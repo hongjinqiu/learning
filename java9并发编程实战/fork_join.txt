@@ -1,0 +1,162 @@
+http://ifeve.com/java-fork-join-framework/
+
+Doug Lea 的论文翻译阅读,
+
+
+示例代码位于:E:\hongjinqiu\learning\java9并发编程实战\配套代码\Java9ConcurrencyCookbookSecondEdition_Code\
+
+
+Project Room 的尝试,
+
+所有的 Fork/Join 任务都是轻量级执行类的实例，而不是线程实例。
+
+一个简单的控制和管理类（这里指的是FJTaskRunnerGroup）来启动工作线程池，并初始化执行一个由正常的线程调用所触发的Fork/Join任务（就类似于Java程序中的main方法）。
+
+旧的线程是继承自 Thread, 而 Fork/Join 任务要继承自 FJTask?
+
+有点明白了, 非常的快,
+
+并且如何在 spring 中,传值给 map_reduce, 喵的,
+
+跟垃圾回收还有关,在一个线程中分配,在另外一个线程中运行,
+这种垃圾回收机制优势的一个典型体现：使用这种垃圾回收机制，四个线程运行的Fib程序耗时仅为5.1秒钟，而如果在Java虚拟机设置关闭代拷贝回收（这种情况下使用的就是标记清除（mark−sweep）垃圾回收机制了），耗时需要9.1秒钟。
+
+接下来, 阅读 pdf 的内容, 喵的, 
+
+第5章 fork/join框架
+
+1.创建一个fork/join池
+2.合并任务的执行结果
+3.异步地运行任务
+4.在任务中抛出异常
+5.取消一个任务
+
+Java 7则又前进了一大步，其中包括ExecutorService接口的用来处理特定问题的额外实现— fork/join 框架。
+
+为了达到这个目标，fork/join框架执行的任务有如下限制。
+1.任务只能使用fork()和join()方法作为同步机制。如果在任务中使用了其他同步机制，工作线程在同
+步操作中就不能再执行其他任务。例如，如果让一个处于fork/join框架中的任务进入休眠状态，那么在
+任务休眠时执行这个任务的工作线程就不能执行其他任务。
+2.任务不应该执行任何I/O操作，如读/写文件中的数据。
+3.任务不能抛出受检异常。任务必须包含必要的处理受检异常的代码。
+
+Fork/join 类型由两个核心类组成:
+1.ForkJoinPool,
+2.ForkJoinTask, 一般用到三个子类:
+2.1. RecursiveAction, 无返回结果,
+2.2. RecursiveTask, 返回一个执行结果,
+2.3. CountedCompleter类，所有子任务执行完毕后启动一个完成方法。
+
+
+默认的配置下 ForkJoinPool 对象创建了一个线程数等于处理器数的池,
+
+看到 192 页, 分而治之的方法, 分下来, 再合并起来, 如果是用 activeMQ 来操作呢?
+
+一方面，在ForkJoinTask类的compute()方法中，不能抛出任何受检异常，因为该方法的实现声明不
+包含抛出异常，所以必须在内部实现处理异常的功能；另一方面，可以抛出一个未受检异
+常。ForkJoinTask类和ForkJoinPool类的行为可能和读者所期望的不同，程序不会结束执行，并且不会在
+控制台输出任何信息，异常就像从未抛出一样，而是直接被程序“吞食”了。只有当在初始任务中调
+用get()方法时，任务才会抛出异常。不过，开发者可以使用ForkJoinTask类中的部分方法来获知任务是
+否已抛出异常和抛出异常的类型。本节将介绍获取这些信息的方法。
+
+
+generate parallel streams from different source.
+1.创建并行流的所有方法,
+使用了List类的parallelStream()方法。实际上，该方法定义在Collection接口中。所有实现该接口的
+类（比如ArrayList、LinkedList、TreeSet）都实现了该方法。开发者可以用stream()方法创建一个串
+行流，也可以用parallel Stream()方法创建一个并行流。
+
+2.
+使用了Supplier接口的一个实现—MySupplier。这个接口提供了get()方法。每当流需要处理一个元素
+时，它都会调用这个方法。由于可以创建一个包含无数元素的流，因此应该使用一个限制元素数量的
+方法，比如limit()。
+
+3.
+使用了Stream类的of()方法。它是一个静态方法，接收变长参数，返回的Stream对象以这些参数作为元素。
+
+4.
+使用了BufferedReader的lines()方法。它所返回的流，每个元素都是从BufferedReader中读取到的一行。
+我们用lines()方法读取了文件所有的行，也可以在其他类型的BufferedReader上使用它。
+
+5.
+使用了Files类的list()方法。该方法接收一个表示文件夹的Path对象，并返回Path对象的流，流中的
+元素代表着Path对象背后的文件夹中的内容。请记住，该方法不是递归的，如果这个文件夹有一个或
+多个子文件夹的话，那么list()方法是不会处理这些内容的。Files类还有其他一些处理流的方法，稍
+后会讲到
+
+6.
+使用了Arrays类的stream()方法。它接收一个数组并返回一个包含该数组元素的Stream。如果这个数
+组是双精度型、整型或长整型的，它会返回一个DoubleStream、IntStream或LongStream对象。它们都
+是特殊类型的流，可用于处理相应的数字类型。
+
+7.
+生成了一个随机数字流。使用了Random类的doubles()方法，向其传递了想要得到的元素数量，其实还
+可以向其传递元素的最大值和最小值。
+最后，使用了Stream类的concat()方法。它接收两个流，并返回一个包含了这两个流所有元素的流
+
+
+peek()：该方法是一个中间操作，允许在流的每个元素上执行一个动作，并返回一个包含相同元素的
+流。该方法通常用于调试。由于和所有中间操作一样，它也是懒执行的，因此只有在结尾操作发生
+时，它所指定的动作才会在元素上执行。
+
+
+stream 操作的
+reduce 和 collect 操作相关,
+
+
+collectors 相关, 第九版新冠治疗指南,
+
+Map<String, List<Person>> personsByName = persons.parallelStream().collect(Collectors.groupingByConcurrent(Person::getFirstName));
+String message = persons.parallelStream().map(p -> p.toString()).collect(Collectors.joining(","));
+
+Map<Boolean, List<Person>> personsBySalary = persons.parallelStream().collect(Collectors.partitioningBy(p -> p.getSalary() > 50000));
+
+216 页,
+
+转换流中的元素,
+
+6.10 在反应式流上反应式编程,发布者,订阅者编程,		222 页,
+
+238 并发集合, 简单地瞄瞄,
+
+运用ConcurrentLinkedDeque类的非阻塞双端队列
+	getFirst()和getLast()：这两个方法会分别返回双端队列的首端和末端元素。它们不会删除双端队列
+	中返回的元素。如果队列中没有任何元素，则它们会抛出NoSuchElementException异常。
+	peek()、peekFirst()和peekLast()：这些方法会分别返回双端队列的首末端元素。它们不会删除返回
+	的元素。如果队列中没有任何元素，则它们返回null值。
+	remove()、removeFirst()和removeLast()：这些方法会分别返回双端队列的首末端元素，都会删除返
+	回的元素。如果队列中没有任何元素，则它们会抛出NoSuchElementException异常。
+运用LinkedBlockingDeque类的阻塞双端队列
+	takeFirst()和takeLast()：这些方法分别返回双端队列中的第一个和最后一个元素。同时它们会移除
+	队列中已经返回的元素。如果队列是空的，则它们会阻塞线程直到队列中有元素时为止。
+	getFirst()和getLast()：这些方法分别返回双端队列中的第一个和最后一个元素。但它们不会移除队
+	列中已经返回的元素。如果队列是空的，则它们会抛出一个NoSuchElementException异常。
+	peek()、peekFirst()和peekLast()：peekFirst()和peekLast()方法分别返回队列中的第一个和最后一
+	个元素。但它们不会移除队列中已经返回的元素。如果队列是空的，则它们会返回null值。
+	poll()、pollFirst()和pollLast()：pollFirst()和pollLast()方法分别返回队列中的第一个和最后一
+	个元素。同时它们会移除队列中已经返回的元素。如果队列是空的，则它们会返回null值。
+	add()、addFirst()和addLast()：addFirst()和addLast()方法会分别添加一个元素到队头和队尾。如
+	果双端队列是满的（在创建队列的时候指定了队列的长度），则它们会抛出一
+	个IllegalStateException异常。
+运用LinkedTransferQueue类的用于生产者和消费者数据的阻塞队列,在第8章,
+运用PriorityBlockingQueue类的按优先级排序元素的阻塞队列
+	PriorityBlockingQueue还有其他比较有趣的方法，具体如下。
+	clear()：该方法会移除所有队列中的元素。
+	take()：该方法会返回并移除队列中的首个元素。如果队列是空的，则它会阻塞线程直到不为空为止。
+	put(E e)：这是PriorityBlockingQueue的泛型参数。该方法会将元素插入到队列中。
+	peek()：该方法会返回且不移除队列中的首个元素。
+运用DelayQueue类的延迟元素的阻塞队列,
+	这个要小研究一下，
+运用ConcurrentSkipListMap类的非阻塞navigable map
+运用ConcurrentHashMap类的非阻塞散列表
+运用AtomicLong和AtomicIntegerArray类的原子性变量
+存储用volatile标记关键字的字段变量
+运用变量句柄的在个体类字段中的原子性操作
+
+看到了 239 页,
+
+看到第4章,
+
+
+
+

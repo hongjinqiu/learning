@@ -1,0 +1,63 @@
+参考这篇文章,
+
+https://springdoc.cn/spring-data-mongodb/
+
+ "日期字段名":{$gte:new Date(2012,11,7)},"et":{$lte:new Date(2012,11,7)}
+
+{createTs:{$gte:new Date(2018,12,1)}}
+
+
+添加这个注解, 用于启动 mongoDB 的查询,
+@EnableMongoRepositories
+
+
+@Document(collection = "bill_notification")
+public class BillNotificationDocument implements Serializable {
+
+
+8.4. 定义 Query 方法
+repository 代理有两种方法可以从方法名中推导出 repository 特定的查询。
+*通过直接从方法名派生出查询。
+*通过使用手动定义的查询。
+
+直接通过方法来查,
+解析查询方法名称分为主语和谓语。第一部分（find…​By, exists…​By）定义了查询的主语，第二部分形成谓语。引入句（主语）可以包含进一步的表达。在 find（或其他引入关键词）和 By 之间的任何文本都被认为是描述性的，除非使用一个限制结果的关键词，如 Distinct 在要创建的查询上设置一个不同的标志，或 Top / First 来限制查询结果。
+
+查询推导机制,
+https://springdoc.cn/spring-data-mongodb/#appendix.query.method.subject
+
+interface PersonRepository extends Repository<Person, Long> {
+
+  List<Person> findByEmailAddressAndLastname(EmailAddress emailAddress, String lastname);
+
+  // Enables the distinct flag for the query
+  List<Person> findDistinctPeopleByLastnameOrFirstname(String lastname, String firstname);
+  List<Person> findPeopleDistinctByLastnameOrFirstname(String lastname, String firstname);
+
+  // Enabling ignoring case for an individual property
+  List<Person> findByLastnameIgnoreCase(String lastname);
+  // Enabling ignoring case for all suitable properties
+  List<Person> findByLastnameAndFirstnameAllIgnoreCase(String lastname, String firstname);
+
+  // Enabling static ORDER BY for a query
+  List<Person> findByLastnameOrderByFirstnameAsc(String lastname);
+  List<Person> findByLastnameOrderByFirstnameDesc(String lastname);
+}
+
+https://springdoc.cn/spring-data-mongodb/#appendix.query.method.predicate
+
+8.8.1. Querydsl 扩展
+Querydsl 是一个框架，可以通过其 fluent API构建静态类型的类似SQL的查询。
+
+一些Spring Data模块通过 QuerydslPredicateExecutor 提供与 Querydsl 的集成，正如下面的例子所示。
+
+
+实在不满足的话, 还有 
+MongoTemplate,
+MongoOperations,
+
+
+
+
+
+

@@ -1,0 +1,17 @@
+HttpPost post=new HttpPost("https://api.weixin.qq.com/cgi-bin/template/api_set_industry?access_token=ACCESS_TOKEN");
+JSONObject param=new JSONObject();
+param.put("key","value");
+StringEntity  requestentity=new StringEntity(param.toString());
+requestentity.setContentType(ContentType.APPLICATION_JSON.toString());
+post.setEntity(requestentity);
+
+
+	List<NameValuePair> params=new ArrayList<>();
+		params.add(new BasicNameValuePair("key1","value1"));
+		params.add(new BasicNameValuePair("key2","value2"));
+		params.add(new BasicNameValuePair("key3","value3"));
+		UrlEncodedFormEntity  entity=new UrlEncodedFormEntity(params,"UTF-8");
+		post.setEntity(entity);
+
+
+

@@ -1,0 +1,411 @@
+重启：systemctl restart docker
+
+24  docker run --name mynginx -d -p 82:80  -v /data/nginx/conf/nginx.conf:/etc/nginx/nginx.conf  -v /data/nginx/logs:/var/log/nginx -d 568c4670fa80
+   25  docker images 
+   26  docker pull nginx
+   27  docker run --name autobNginx -d -p 8283:80  -v /data/log/autobt/nginx/conf/nginx.conf:/etc/nginx/nginx.conf  -v /data/log/autobt/nginx/logs:/var/log/nginx  docker.io/nginx:latest
+   28  docker ps 
+   29  docker ps -al
+   30  docker start autobNginx
+   31  docker logs autoNginx
+   32  docker ps 
+   33  docker ps -al
+   34  docker rm ae7a2e7b45df
+   35  docker ps -ax
+   36  docker ps -al
+   37  docker ps
+   40  docker ps 
+   41  docker
+   42  docker ps 
+   43  docker logs autobt-web
+   44  docker ps
+   45  docker logs autobt-web
+   46  docker ps 
+   47  docker logs autobt-web
+   48  docker ps 
+   49  docker logs autobt-web
+  123  docker ps
+  124  docker logs autobt-web
+  133  docker ps 
+  135  docker ps 
+  187  docker ps 
+  // docker inspect 可以查看 docker 的配置,其中 Config.Env.SPRING_PROFILES_ACTIVE=prd_45, 写明了 application.yml 的环境配置,
+  188  docker inspect autobt-web
+  189  docker ps
+  252  docker ps 
+  256  docker ps 
+  257  docker exec -it label-web
+  258  docker exec -it label-web bash
+  261  docker ps 
+  264  docker ps 
+  274  docker ps 
+  275  docker logs label-web
+  276  docker ps 
+  277  docker inspect label-web
+  278  docker ps 
+  282  docker ps 
+  287  docker ps 
+  289  docker ps 
+  290  docker exec -it label-web bash
+  291  docker ps 
+  292  docker ps
+  303  docker ps 
+  304  docker logs label-web
+  305  docker logs label-web | grep Exception
+  306  docker ps 
+  308  docker logs label-web | gre"cost time"
+  309  docker logs label-web | grep "cost time"
+  310  docker logs label-web | gre"cost time"
+  311  docker logs label-web | grep "cost time"
+  313  docker logs label-web | grep "cost time"
+  318  docker ps 
+  319  docker ps \
+  320  docker ps 
+  321  docker logs label-web 
+  325  docker ps 
+  334  docker ps 
+  335  docker restart label-web
+  336  docker ps 
+  343  docker ps 
+  350  docker ps 
+  351  docker inspect utobt-web
+  352  docker inspect autobt-web
+  353  docker ps 
+  355  docker ps 
+  359  docker ps 
+  361  docker ps 
+  366  docker ps 
+  369  cat /etc/docker/daemon.json 
+  370  systemctl status docker.service
+  371  docker ps 
+  373  docker ps 
+  375  docker ps 
+  377  docker ps 
+  380  docker ps 
+  383  docker ps 
+  387  docker ps 
+  388  docker exec -it label-web bash
+  390  docker ps 
+  391  docker attach --sig-proxy=false label-web
+  392  docker ps 
+  393  docker attach --sig-proxy=false label-web
+  394  docker ps 
+  395  docker attach --sig-proxy=false label-web
+  397  docker ps 
+  399  docker ps 
+  404  docker ƽʱ
+  405  docker ps
+  408  docker ps
+  409  docker
+  410  docker ps 
+  422  docker ps 
+  424  docker ps 
+  425  docker restart autobt-web
+  426  docker ps 
+  428  docker exe -it autobt-web bash
+  429  docker exec -it autobt-web bash
+  435  docker ps
+  437  docker ps 
+  470  docker ƽʱ
+  471  docker ps
+  475  docker ps 
+  477  docker ps 
+  479  docker ps 
+  486  docker ps 
+  488  docker ps 
+  489  docker ps  
+  532  docker ps 
+  538  docker ps 
+  539  docker ƽʱ
+  540  docker ps
+  541  docker logs label-web
+  545  docker ps 
+  552  docker ps 
+  586  dockers ps 
+  587  docker ps 
+  604  docker ps 
+  606  docker ps 
+  654  docker ps 
+  667  docker  ps 
+  677  docker ps 
+  679  docker ps 
+  699  docker ps 
+  700  docker stop autobt-web 
+  701  docker start autobt-web 
+  708  docker ps 
+  709  docker logs autobt-web
+  710  docker stop autbtweb
+  711  docker stop  autobt-web
+  712  docker start  autobt-web
+  998  history|grep docker
+
+
+https://www.cnblogs.com/duanxz/p/10238570.html
+
+docker 中查看 jvm 的信息,
+
+可以看最后的日志信息,
+docker logs -f 容器id
+
+
+https://www.runoob.com/docker/docker-tutorial.html
+
+Docker 安装 Ubuntu
+https://www.runoob.com/docker/docker-install-ubuntu.html
+
+
+Docker 国内镜像
+阿里云的加速器：https://help.aliyun.com/document_detail/60750.html
+网易加速器：http://hub-mirror.c.163.com
+官方中国加速器：https://registry.docker-cn.com
+ustc 的镜像：https://docker.mirrors.ustc.edu.cn
+daocloud：https://www.daocloud.io/mirror#accelerator-doc（注册后使用）
+如果有更好的资源，欢迎通过下面的笔记来分享。
+
+
+
+讲 docker 相关的内容,
+https://www.zhihu.com/question/27227492
+
+Docker基础技术：Linux Namespace（上） | | 酷 壳 - CoolShell
+Docker基础技术：Linux Namespace（下） | | 酷 壳 - CoolShell
+Docker基础技术：Linux CGroup | | 酷 壳 - CoolShell
+Docker基础技术：AUFS | | 酷 壳 - CoolShell
+Docker基础技术：DeviceMapper | | 酷 壳 - CoolShell
+
+
+docker-desktop 安装记录,
+阅读这个文章的内容，根据里面的步骤, 
+https://docker.easydoc.net/doc/81170005/cCewZWoN/lTKfePfP
+
+
+碰到的问题有：
+0. C盘空间不够,
+mklink /j "C:\Program Files\Docker" "D:\program files\Docker"
+
+1. wsl 安装 linux 安装不上,
+从另外一篇文章
+https://learn.microsoft.com/zh-cn/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package
+
+找到 debian 的路径,将其安装上,
+
+2. 碰到 wsl 要升级问题 ，
+根据上文的 步骤 4 - 下载 Linux 内核更新包, 把内核给安装上,
+
+memcached-win32-1.4.4-14
+
+1.4.4-14
+
+用 1.6.19,
+1.6.19-alpine 会更小一些,
+
+memcached
+docker pull memcached:1.6.19-alpine
+
+docker run --name my-memcache -d memcached
+
+docker run --name my-memcache -p 11211:11211 -d memcached:1.6.19-alpine memcached -m 16
+
+docker run --name my-memcache --restart=always -p 11211:11211 -d memcached:1.6.19-alpine memcached -m 16
+
+
+zookeeper 的安装呢?
+
+https://hub.docker.com/_/zookeeper
+
+D:\malay_soft\zookeeper-3.4.5\bin\zkServer.cmd
+
+docker pull zookeeper:3.7.1-temurin
+
+docker pull zookeeper:3.7-temurin
+
+docker pull zookeeper:3.8.1
+
+docker pull zookeeper:3.8
+
+docker run --name some-zookeeper --restart always -d zookeeper
+
+Connect to Zookeeper from an application in another Docker container
+$ docker run --name some-app --link some-zookeeper:zookeeper -d application-that-uses-zookeeper
+
+Connect to Zookeeper from the Zookeeper command line client
+$ docker run -it --rm --link some-zookeeper:zookeeper zookeeper zkCli.sh -server zookeeper
+
+Status: Downloaded newer image for zookeeper:3.7.1-temurin
+docker.io/library/zookeeper:3.7.1-temurin
+
+配置自己的文件进去,
+docker run --name my-zookeeper -d -v D:/malay_soft/zookeeper-3.4.5/conf/zoo.cfg:/conf/zoo.cfg -e JVMFLAGS="-Xmx128m" -p 2181:2181 -p 2888:2888 -p 3888:3888 -p 8080:8080 zookeeper:3.7.1-temurin
+
+
+$ docker run --name my-zookeeper --restart=always -d -v D:/malay_soft/zookeeper-3.4.5/conf/zoo.cfg:/conf/zoo.cfg -e JVMFLAGS="-Xmx128m" zookeeper:3.7.1-temurin
+
+
+
+位置可能在这里,
+C:\Users\hongjinqiu\AppData\Roaming\Docker
+	看起来没有安装文件
+C:\Users\hongjinqiu\AppData\Roaming\Docker Desktop
+	看起来没有安装文件
+C:\Users\hongjinqiu\AppData\Local\Docker
+	是有一些文件,日志之类的,但是没有窗口之类的,
+	当前有 2.49G, 
+	装一个 zookeeper, 观察其有多大,
+	mklink /J C:\Users\CJ\AppData\Local\Docker E:\Docker
+	还是 2.49G, 到底是存哪里了?
+	就是存到了这个虚拟硬盘下,
+	可以参考 https://zhuanlan.zhihu.com/p/494334649, 将其挪掉,
+C:\Users\hongjinqiu\AppData\Local\Temp\DockerDesktop
+	看起来没有数据
+C:\Users\hongjinqiu\.docker
+
+
+./Users/hongjinqiu/AppData/Local/Temp/DockerDesktop
+./Users/hongjinqiu/AppData/Local/Docker
+./Program Files/Docker
+./ProgramData/DockerDesktop
+
+
+删除优化空间,
+Docker:如何释放优化Docker desktop 的ext4.vhdx文件
+如果在容器中删除了一些文件, 但是你看到ext4.vhdx占用空间大小无变化, 可以用这个方法优化已释放的空间.
+
+1. 退出docker desktop
+
+2. cmd运行 wsl --shutdown
+
+3. optimize-vhd -Path .\ext4.vhdx -Mode full
+
+4. 等待执行完成, 然后启动docker desktop
+
+
+
+在 wsl 命令中会找不到 docker 的目录, 可以用以下的命令来查看,
+\\wsl$\docker-desktop
+\\wsl$\docker-desktop-data
+
+应该就是在这个目录
+\\wsl$\docker-desktop-data\data\docker
+
+
+wsl 数据迁移,
+wsl --export docker-desktop-data "D:\\docker-desktop-data.tar"
+
+wsl --unregister docker-desktop-data
+
+wsl --import docker-desktop-data "D:\Docker-wsl\wsl" "D:\\docker-desktop-data.tar" --version 2
+
+
+
+在 WSL2 中使用 Docker 时，可能会造成 Vmmem 进程消耗掉全部的内存，导致机器卡顿，且通过任务管理器或者通过 taskkill 都无法终止此进程。
+
+方案
+在用户目录下新建文件 .wslconfig，增加下面的配置，限制其内存占用：
+[wsl2]
+memory=6GB
+swap=0
+localhostForwarding=true
+
+redis
+======================================
+docker pull redis:6.0-alpine3.17
+
+docker run --name my-redis -p 6379:6379 -d redis:6.0-alpine3.17 
+
+docker run -it --network some-network --rm redis redis-cli -h some-redis
+
+客户端连接,
+docker run --name my-redis-cli -it --network host --rm redis:6.0-alpine3.17 redis-cli 
+
+
+docker events --since='2023-04-27' --filter='container=a9a6eb22a6da254801880c01ede66a3e86b394d95af52327be37c519cd6dca44'
+
+docker events --since='2023-04-27' --filter='container=a5913fc240e9'
+
+
+docker build  -t ident-open-tax-service:2023-04-27.1 .
+
+docker image rm registry.cn-hangzhou.aliyuncs.com/onlyou/blink-app:2023-5-4_4
+
+
+导出,
+docker save registry.cn-hangzhou.aliyuncs.com/onlyou/blink-app:2023-4-25_1 -o ./blink-app:2023-4-25_1.tar
+
+导入,
+1.
+docker load<ubuntu.tar
+2.
+docker load --input fedora.tar
+
+注: windows 下 --net=host -p 8898:8898 有问题, 不能把端口号给映射出来,
+
+docker run -d --net=host -e server_port=8891 -e SPRING_PROFILES_ACTIVE=standard -e VM_OPTION="-XX:MaxPermSize=512m -Xmx1024m -Dapp.pdf.removeFreestyleField=true -Dapp.special.useGeneralEInvoice=true" --name blink-app_8891 -v /root/data/log/blink/blink-app-log:/data/log/blink/blink-app-log --privileged=true -v /root/home/tmpdir:/home/tmpdir -v /root/home/data:/home/data -e TZ=Asia/Shanghai registry.cn-hangzhou.aliyuncs.com/onlyou/blink-app:2023-6-7_1
+
+
+看到了 k8s 数据持久化,
+https://www.bilibili.com/video/BV1Tg411P7EB?p=6&spm_id_from=pageDriver&vd_source=e9a5621361eeac3fd6c7567cf4846978
+
+helm
+https://www.bilibili.com/video/BV1Tg411P7EB/?p=8&spm_id_from=pageDriver&vd_source=e9a5621361eeac3fd6c7567cf4846978
+
+
+亲测有效：docker清理Overlay2占用磁盘空间
+https://blog.csdn.net/Small_StarOne/article/details/123655176
+
+docker stop blink-app_8891
+docker rm blink-app_8891
+
+
+docker ubuntu 相关, 网络要怎么指定呢?
+https://blog.csdn.net/ysy950803/article/details/101020466
+
+
+ubuntu 中创建窗口的办法,
+docker运行Ubuntu16.04并使用systemd
+
+https://blog.csdn.net/shangyexin/article/details/103782925
+
+
+查看 docker run 命令行的工具,
+
+https://zhuanlan.zhihu.com/p/474154743#:~:text=%E5%AE%83%E7%9A%84%E7%94%A8%E6%B3%95%E5%BE%88%E7%AE%80%E5%8D%95%20docker%20run%20--rm%20-v,%2Fvar%2Frun%2Fdocker.sock%3A%2Fvar%2Frun%2Fdocker.sock%20assaflavie%2Frunlike%20YOUR-CONTAINER%20%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87%E5%A2%9E%E5%8A%A0%20-p%20%E5%8F%82%E6%95%B0%EF%BC%8C%E8%AE%A9%E6%98%BE%E7%A4%BA%E7%BB%93%E6%9E%9C%E8%87%AA%E5%8A%A8%E6%8D%A2%E8%A1%8C%EF%BC%8C%E4%B8%8B%E9%9D%A2%E6%98%AF%E6%88%91%E7%9A%84%E7%9C%9F%E5%AE%9E%E6%B5%8B%E8%AF%95%EF%BC%9A
+
+docker pull assaflavie/runlike
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock assaflavie/runlike YOUR-CONTAINER
+
+
+docker run --name ubuntu_demo -itd daocloud.io/library/ubuntu:20.04
+
+docker exec -it ubuntu_demo bash
+
+追加参数,
+docker container update --restart=always 容器名字
+
+
+4.将容器commit 成镜像
+docker tag <existing-image> <hub-user>/<repo-name>[:<tag>]
+docker commit 277e80820516 jerrymouseli/wvp_lirj:0322
+
+5.docker push 镜像到docker hub 的仓库
+docker push<hub-user>/<repo-name>:<tag>
+docker push jerrymouseli/wvp_lirj:0322
+
+
+docker 显示网络
+
+docker network ls
+
+
+run_demo_docker.sh
+
+GPU 显示的命令, nvidia-smi
+
+Docker 应用容器 获取宿主机root权限（特殊权限） --privileged=true
+
+--runtime=nvidia	在 docker 在容器运行时生态系统中启用 GPU , 要安装 nvidia-docker,
+--detach=true		就是 -d 在后台运行
+--hostname=lingyao101	容器主机名
+
+
+
+

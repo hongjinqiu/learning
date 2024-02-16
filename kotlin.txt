@@ -1,0 +1,11 @@
+主要是协程啦,
+
+https://alleniverson.gitbooks.io/kotlin-tutorials/
+
+
+用Kotlin Coroutine改造Vert.x的函数回调地狱{ _ -> Callback Hell }
+https://zhuanlan.zhihu.com/p/28046403
+
+
+即还有一种 kotlin 的写法,解决掉回调函数地狱的问题,
+

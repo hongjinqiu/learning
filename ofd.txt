@@ -1,0 +1,10 @@
+https://www.yozodcs.com/page/example.html
+
+永中 DCS 文档在线预览
+
+
+
+1.ofd 是什么样的格式?
+	Open Fixed-layout Document, 中国的一种自主文件格式，要打破政府部门和党委机关电子公文格式不统一，以方便进行电子文档的存储、读取以及编辑。
+	
+	大家可以在搜索引擎中搜索 “永中 DCS 文档在线预览”，在预览页面选择 “示例”，然后选择 “Any2OFD”，上传本地文件后，就可以将 文档导出为 OFD 文件。

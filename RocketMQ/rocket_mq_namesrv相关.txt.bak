@@ -1,0 +1,154 @@
+
+https://juejin.cn/post/7010947558587514893			
+深入剖析RocketMQ源码-NameServer
+
+涉及到的类有:
+NamesrvController,
+注册的部分, 涉及到 broker 部分的内容,
+
+顺序消息, 有一个 orderMessageEnable 的配置参数,
+
+需要了解几部分的内容,
+一、RocketMQ架构简介
+	1.1 逻辑部署图
+	1.2 核心组件说明
+	1.3 设计理念
+二、NameServer架构设计
+三、 启动流程
+	3.1 时序图
+	3.2 创建NamesrvController
+	3.3 初始化并启动
+四、路由管理
+	4.1 路由元信息
+		4.1.1 TopicQueueTable
+		4.1.2 BrokerAddrTable
+		4.1.3 ClusterAddrTable
+		4.1.4 BrokerLiveTable
+		4.1.5 filterServerTable
+	4.2 路由注册
+		4.2.1 Broker发送心跳包
+		4.2.2 NameServer处理心跳包
+	4.3 路由剔除
+		4.3.1 触发条件
+		4.3.2 源码解析
+	4.4 路由发现
+		4.4.1 producer主动拉取
+		4.4.2 NameServer返回路由信息
+五、小结
+
+阅读总结: 一般般, 可以参考目录结构来跟踪代码,
+
+
+https://blog.csdn.net/qq_33036061/article/details/117930054
+RocketMQ源码系列(一) NameServer 核心源码解析
+
+读完感受:一般般,不值得再次阅读,
+
+https://zhuanlan.zhihu.com/p/594581812
+【RocketMq】RocketMq-NameServ 源码分析（Ver4.9.4）
+
+路由注册, 涉及到 BrokerController.start(), BrokerController.registerAll(), 
+
+我们进入到关键判断代码org.apache.rocketmq.namesrv.routeinfo.RouteInfoManager#isBrokerTopicConfigChanged:
+
+读完感受:一般般,
+
+
+
+https://juejin.cn/post/7230775751125057573
+2.RocketMQ - NameServer源码解析
+
+running,----------------------------------------,
+
+resultLi = []
+li.forEach(function(item){resultLi.push(item.textContent);})
+console.log(resultLi.join("\n"))
+
+他还可能有许多的 NettyRemotingServer, 有一个字段:
+private final ConcurrentMap<Integer/*Port*/, NettyRemotingAbstract> remotingServerTable = new ConcurrentHashMap<>();
+
+
+1. remotingServer start,
+2. remotingClient 添加当前地址到 NameServerSrv 里面去,
+3. remotingClient start,
+
+
+1. 初始化 defaultEventExecutorGroup,
+2. 初始化 Bootstrap handler,
+3. 起一个线程, 每隔1秒扫描一下 ResponseTable, 与 RemotingServer 的扫描相一致,
+4. 定时扫描 scanAvailableNameSrv, 扫描一下 namesrvAddr 是否正常,
+
+
+this.routeInfoManager.start();
+
+1. 启动完有哪些线程呢?
+2. 看一下具体的路由管理相关,
+
+
+
+NamesrvStartup 启动后的线程:
+1. AsyncAppender-Worker-RocketmqNamesrvAppender,	应该是日志创建的,
+2. AsyncAppender-Worker-RocketmqTrafficAppender,	应该是日志创建的,
+3. ClientHouseKeepingService,				NettyRemotingClient.timer, ->scanResponseTable, ->scanAvailableNameSrv,
+4. ClientRequestExecutorThread_1 至 8,			NamesrvController.clientRequestExecutor, 用在了 remotingServer->GET_ROUTEINFO_BY_TOPIC, 用来处理客户端通过主题查询路由信息,
+	但是看程序, 又没看到调用的地方, 因此, 比较奇怪,
+5. FileWatchService,					NamesrvController.fileWatchService 中启动, 用来监听 tls 文件是否改变, 有改变进行重新加载,
+6. logback-1,						应该是日志创建的,
+7. NettyClientScan_thread_1 至 4,			NettyRemotingClient.scanExecutor, 扫描 namesrv 是否可以连接,
+8. NettyClientSelector_1				NettyRemotingClient.eventLoopGroupWorker, NioEventLoopGroup, 初始化客户端线程
+9. NettyClientWorkerThread_1 至 4,			NettyRemotingClient.defaultEventExecutorGroup, DefaultEventExecutorGroup, 客户端线程池, 处理 NettyEncoder, NettyDecoder, NettyClientHandler 这些 handler 的内容,
+10. NettyEventExecutor,					NettyRemotingAbstract.NettyEventExecutor, 监听各种事件的,
+	那事件从哪里来呢? 
+	在 abstract 类中, 有一个 nettyEventExecutor, 其是一个死循环, 从 eventQueue 里面拉取数据, 有事件处理的时候,
+	也是 NettyRemotingServer 在处理, -> namesrvController.getRouteInfoManager().onChannelDestroy 方法,
+11. NettyNIOBoss_1,					NettyRemotingServer.eventLoopGroupBoss, server 的 netty boss thread,
+12. NettyServerCodecThread_1 至 8,			NettyRemotingServer.defaultEventExecutorGroup, 用在 netty 的各个 handler 的处理,
+13. NettyServerNIOSelector_1 至 3,			NettyRemotingServer.eventLoopGroupSelector, 用在 netty 的 NioEventLoopGroup, 
+14. NettyServerScheduler_1,				NettyRemotingServer.scheduledExecutorService, -> printRemotingCodeDistribution,
+15. NSScanScheduledThread,				NamesrvController.scanExecutorService, -> routeInfoManager.scanNotActiveBroker,
+16. NSScheduledThread,					NamesrvController.scheduledExecutorService, -> printWaterMark,
+17. org.apache.rocketmq.namesrv.routeinfo.BatchUnregistrationService,		-> this.routeInfoManager.unRegisterBroker,
+18. RemotingExecutorThread_1 至 16,			remotingServer.registerDefaultProcessor 用的,
+19. ServerHouseKeepingService,				NettyRemotingServer.timer,	-> scanResponseTable,
+20. Signal Dispatcher,
+
+即有一堆的线程, 在处理 netty 的这些请求, 
+
+线程高的, 
+18. RemotingExecutorThread_1 至 16,			remotingServer.registerDefaultProcessor 用的,
+12. NettyServerCodecThread_1 至 8,			NettyRemotingServer.defaultEventExecutorGroup, 用在 netty 的各个 handler 的处理,
+4. ClientRequestExecutorThread_1 至 8,			NamesrvController.clientRequestExecutor, 用在了 remotingServer->GET_ROUTEINFO_BY_TOPIC, 用来处理客户端通过主题查询路由信息,
+
+
+1.路由注册的过程,
+broker 启动时, 向 NameServer 发送心跳语句, 每隔30秒再发一次,
+
+NameServer 收到心跳包后, 更新数据结构,
+
+4.2.1 Broker发送心跳包， namesrv 是哪里在处理呢?
+
+路由注册的过程, 由 Broker 来发送心跳包,
+
+namesrv 如何来处理请求呢?
+
+NettyRemotingServer -> start -> configChannel -> serverHandler(NettyServerHandler) -> remotingAbstract.processMessageReceived -> processRequestCommand
+-> buildProcessRequestHandler -> response = pair.getObject1().processRequest(ctx, cmd); -> DefaultRequestProcessor -> processRequest,
+
+Broker 这里呢?
+
+从这里开始,
+BrokerController.this.registerBrokerAll(true, false, brokerConfig.isForceRegister());
+
+要发请求时, 再在 NettyServerHandler.channelRead0 这里断点,
+
+
+4.3 路由剔除,
+
+4.4.1 producer主动拉取,				有地址就可以发送了,
+研究一下, 是如何来更新的, 如何来分片之类的,
+
+RocketMQ broker源码相关研究,
+
+
+
+

@@ -1,0 +1,21 @@
+https://blog.csdn.net/kqZhu/article/details/107514406
+
+
+172.16.202.11
+
+1、查看cpu的方法
+cat /proc/cpuinfo
+
+16核 2.27G
+
+2、查看内存使用
+free -m
+
+16G
+
+
+找出文件,并统计文件大小,
+find ./modelRes/ -name “*.pth.tar”|xargs du -ach | tail -1
+
+
+

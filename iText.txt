@@ -1,0 +1,510 @@
+
+flying saucer:	https://flyingsaucerproject.github.io/flyingsaucer/r8/guide/users-guide-R8.html
+
+参考:http://www.vogella.com/tutorials/JavaPDF/article.html
+
+参考:https://stackoverflow.com/questions/17878547/itext-get-content-size
+
+参考:https://stackoverflow.com/questions/27988503/how-can-i-combine-multiple-pdf-files-excluding-page-breaks-using-itextsharp/28024276#28024276
+
+教程:
+https://www.tutorialspoint.com/itext/index.htm
+
+http://tutorialspointexamples.com/itext-tutorial-java-beginners-eclipse/
+
+需要添加 excel 配置, pdf 配置,
+
+
+PdfTable 固定分页,如果表头里面需要写一个分页数的解决方案,
+https://stackoverflow.com/questions/42847691/itext-pdfptable-with-writeselectedrows
+
+
+https://developers.itextpdf.com/examples/tables-itext5/fit-text-cell
+文字缩小,
+
+pdf 合并,
+
+1.
+var upHeight = getTotalHeight(),
+var pageCount = upHeight / getPDFPage().getHeight();
+if (upHeight / getPDFPage().getHeight() != 0) {
+	pageCount += 1;
+}
+var bottomHeight = xxxxxxx;
+
+var currentPageTotalHeight = pageCount * getPDFPage().getHeight();
+
+if (upHeight + bottomHeight <= currentPageTotalHeight) {
+	var space = currentPageTotalHeight - (upHeight + bottomHeight);
+	if (space > 0) {
+		document.add(createSpace()));
+	}
+} else {
+	var space = currentPageTotalHeight + getPDFPage().getHeight() - (upHeight + bottomHeight);
+	if (space > 0) {
+		document.add(createSpace()));
+	}
+}
+
+document.add(bottomTable);
+
+Document 
+PdfWriter
+
+
+iText怎么来折腾呢?
+
+Chunk:带预定义字体的String,
+Phrase:可包含多个 Chunk 并且允许定义 line spacing.
+Paragraph:Phrase 的子类,并且允许定义更多的 layout attribute,例如 margins.
+Anchor:(锚点),是 Paragraph 的子类,链接.
+Chapter:章,
+	Paragraph subPara = new Paragraph("Subcategory 1", subFont);
+        Section subCatPart = catPart.addSection(subPara);
+	subCatPart.add(new Paragraph("Hello"));
+	......
+	document.add(catPart);
+
+
+
+document.newPage();
+
+PdfPTable table = new PdfPTable(3);
+PdfPCell c1 = new PdfPCell(new Phrase("Table Header 1"));
+table.addCell(c1);
+
+创建出PDF,并合并在一起,并写到末尾,
+
+先测试一下合并,
+
+
+然后是空白的插入,
+
+^^^^^^^^^^^^^^,llx:55.5,lly:665.5555,urx:333.14502,ury:783.6755
+
+width = urx - llx = (333.14502 - 55.5) = 277.64
+height = ury - lly = (783.6755 - 665.5555) = 118.12
+
+
+测试一下合并,我操,真麻烦,妈的,
+
+
+估计要先写一份 A4 的文档,再获取最后两页的 height,再来合并,
+
+页1 + 页2 < 1页,
+(页1 + 页2 > 1页) && (页1 + 页2 < 2页),用2页的高度去减
+
+
+还要计算一下相应的宽度,
+
+以看如何来底部对齐,
+
+倒数第二页高度:635.9999
+倒数第一页高度:118.119995
+
+maxHeight:782.0
+
+merge的算法研究,
+
+高度的算法研究,非常的麻烦,
+
+如果就抛开其文档里面已有高度,开始计算分页,
+
+但是分页完之后,
+
+1.输出第一页,如果第一页的内容的内容,
+2.
+
+
+有各种边界问题,
+
+
+在 service 这边修改,不行就不行了,
+
+
+@page {margin-top: 0.9cm;margin-left: 1.8cm;margin-right: 0.3cm;margin-bottom: 0.5cm;}
+
+
+
+
+http://what-when-how.com/itext-5/constructing-tables-itext-5/
+表格相关,
+还有 image 相关,真麻烦,
+
+
+PdfPTable 相关,
+
+iText 不支持 tableLayout:auto,	因此, tableLayout  全部为 fixed,
+
+http://what-when-how.com/itext-5/
+
+如果某一行有3列,只添加了两列,需要使用 PdfPTable. completeRow(),否则这一列不会被添加,
+
+表格有两个属性:
+
+widthPercentage—A percentage of the available width
+totalWidth—The absolute width expressed in user space units
+
+当 lockedWidth = true时,会使用 totalWidth 的值,否则,使用 widthPercentage,默认为 80%,
+
+pdfPTable.setWidthPercentage(120);// 会超出屏幕宽度,
+				pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+//				pdfPCell.addElement(new Paragraph("column2"));	// 文字不会右对齐,还会往下一些,
+//				pdfPCell.addElement(new Phrase("column2"));	// 文字不会右对齐
+				pdfPCell.setPhrase(new Paragraph("column2"));	// 文字右对齐,反正总是可以,
+				pdfPTable.setWidths(new float[]{100,50});	// 与 new float[]{2,1} 效果相同,
+
+iText can’t calculate column widths based on the content of the columns
+
+2.
+RELATIVE COLUMN WIDTHS
+
+pdfPTable.setTotalWidth(400);
+pdfPTable.setLockedWidth(true);
+//				pdfPTable.setWidthPercentage(120);
+//				pdfPTable.setWidths(new float[]{2,1});
+
+3.宽度的相应计算,比较麻烦一些,如果有一列没写上,
+
+没有 float,真的要计算好各种宽度了,
+
+
+
+
+ABSOLUTE COLUMN WIDTHS
+It’s better to use setTotalWidth() with an array of float values as the parameter, then set the locked width to true.
+
+pdfPTable.setTotalWidth(new float[]{200,100});
+pdfPTable.setLockedWidth(true);
+
+
+------------------
+SPACING BEFORE AND AFTER A PDFPTABLE
+------------------
+pdfPTable.setSpacingBefore(5);
+pdfPTable.setSpacingAfter(5);
+
+
+可以实现整个表格右移,
+pdfPTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+与 float 相对应,
+
+pdfCell 的 background 图的绘画,
+
+
+反正全部要有值,我会添加判断,真麻烦,但是这一列是不会绘制的,
+
+反正,看到 display:none,会直接去掉的,
+
+
+即表格有两种形式,百分比和绝对值,
+
+但是在 html 里面不起作用,
+
+那不是要尽量弄一个 span 出来,还要拼空格,只好这样了,
+
+
+多个 span,拼装到一个 span 里面,中间拼空格的方式,
+
+如果是这样的话,那么中间下划线怎么办?
+
+用 table 来实现,真麻烦,
+
+
+SPACING IN CELLS
+用这个方法	setLeading(0,1),
+
+不换行,用
+setNoWrap(true)
+(Paragraph,添加多个 Chunk 后,在父 Cell 设置 nowrap,也是不会换行,
+
+table 需要添加到 document 中才知道高度,
+可以通过 setFixedHeight 来取得高度,
+
+因此,需要新建一个 
+PdfWriter pdfWrite = null;
+try {
+	pdfWrite = PdfWriter.getInstance(document1, new FileOutputStream("E:\\hongjinqiu\\tmp\\tmp\\tmpPdf.pdf"));
+	document1.open();
+	document1.add(pdfPTable);
+	System.out.println("height after add to document:" + pdfPTable.calculateHeights());
+	document1.close();
+	pdfWrite.close();
+} catch (FileNotFoundException e) {
+	throw new PrintmetaException(e);
+}
+document.add(pdfPTable);
+
+来写入对应的内容,
+
+
+Figure 4.6 Different row height methods for cells and tables
+
+单元格设置固定高度用:
+cell.setFixedHeight,
+最小值用:
+cell.setMiniumHeight
+
+用来设置最后一行,换页时,是否切到第二页,还是整个下拉到第二页,
+table.setExtendLastRow,
+
+setBackground,
+setGrayFill,
+
+
+无边框,用 
+setBorder(Rectangle.NO_BORDER)
+
+
+cell 有两种模式,
+
+1.cell.setPhrase(new Paragraph()),	文本模式,会忽略掉 paragraph 的一些属性值,
+2.cell.addElement(new Paragraph()),	此时,一些属性值就会起作用,
+
+
+图像用:
+Image.getInstance(String.for
+
+将 image 作为参数直接传给 PdfPCell,
+img.setWidthPercentage(50);
+
+
+
+背景图，参考：
+https://stackoverflow.com/questions/24162974/how-to-set-background-image-in-pdfpcell-in-itext
+
+https://developers.itextpdf.com/examples/tables/clone-adding-background-table#680-imagebackground.java
+
+只看这个就够了,
+https://developers.itextpdf.com/examples/tables/table-and-cell-events-draw-borders
+
+
+
+重复表头和表尾,
+Repeating headers and footers
+setBackgroundColor,
+
+
+使用 table.setHeaderRows(3);
+table.setFooterRows(1);
+
+
+还有一个 setSkipFirstHeader(),setSkipLastFooter(),
+
+
+最后一行不换页:
+PdfPTable table = getTable();
+table.setSplitLate(false);
+document.add(table);
+
+
+
+用 table.setComplete(true); 可释放内存,
+
+使用 TableEvent 来修改表头的相关内容,
+
+PdfPTableEvent,
+PdfPCellEvent,
+
+不知道以前如何来实现?
+
+
+
+先计算一遍,才会知道高度,真麻烦, ------------------------, 如果设了 TotalWidth 和 lockWidth ,即可知道高度,
+
+服务端的实现,
+1.xsd 的文件生成 
+2.开始做大表格的实现,
+2.1.固定表头,
+2.2.固定表身重复,
+2.3.固定表尾,
+
+setTotalWidth(400);
+setLockWidth(true);
+得到:
+
+height after cell1:16.0, totalHeight is:16.0
+height after cell2:32.0, totalHeight is:32.0
+
+
+pdfPTable.setWidthPercentage(100);
+height after cell1:0.0, totalHeight is:0.0
+height after cell2:0.0, totalHeight is:0.0
+
+即,表格在设置固定宽度时,可以计算出高度,
+
+
+
+{
+	document1.add(pdfPTable);
+	pdfPCell = new PdfPCell();
+	pdfPCell.addElement(new Paragraph("column1column1column1"));
+	pdfPTable.addCell(pdfPCell);
+	pdfPTable.completeRow();
+	此时,将新增的这一行,将不会进入 document 中,因此,计算高度会比较麻烦一些?
+}
+
+那旧的换页写值,是如何来实现的?
+
+不知道行不行,可能可以行,
+https://developers.itextpdf.com/question/how-generate-report-dynamic-header-pdf-using-itextsharp
+
+先做再说,
+换页应该是参考:
+http://what-when-how.com/itext-5/adding-page-events-to-pdfwriter-itext-5/
+
+
+换页头不增加的问题,
+https://www.experts-exchange.com/questions/26381407/Auto-Generate-Page-Number-when-creating-PDF-using-iText-API-version-5-0-3.html
+
+
+换页头行号改变的问题,
+https://stackoverflow.com/questions/28610545/get-page-number-in-itext
+
+https://stackoverflow.com/questions/20716263/setting-header-row-in-itext-table
+
+
+cell = new PdfPCell(new Phrase("Page No ${writer.getPageNumber()}", new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD) )) 
+cell.setBorder(Rectangle.TOP) 
+cell.setHorizontalAlignment(Element.ALIGN_RIGHT) 
+cell.setVerticalAlignment(Element.ALIGN_MIDDLE) 
+cell.setColspan(header.size()) 
+table.addCell(cell) 
+table.setHeaderRows(headerRows) 
+table.setFooterRows(1) 
+table.setSkipLastFooter(true)
+
+据说可以,
+– Kamal kannan May 14 '17 at 11:43
+
+要不然只能修改算法了,动态的拼第二页出来,也比较麻烦,
+
+
+
+那只能每一页都相同了,
+
+如果用 iText 7呢?
+
+那真的就要一个个的拼了,
+
+
+
+
+边框 dashed,需要用 CellEvent,
+
+class CustomCell implements PdfPCellEvent {
+ public void cellLayout(PdfPCell cell, Rectangle rect,
+                   PdfContentByte[] canvas) {
+                   PdfContentByte cb = canvas[PdfPTable.LINECANVAS];
+                   cb.setLineDash(new float[] {3.0f, 3.0f}, 0);           
+                   cb.stroke();
+          }
+ }
+
+ public class Main {
+
+         public static void main(String[] args) throws Exception {
+             Document document = new Document();
+             PdfWriter.getInstance(document, new FileOutputStream("output.pdf"));
+             document.open();
+             CustomCell border = new CustomCell();
+
+             PdfPTable table = new PdfPTable(6);
+             PdfPCell cell;
+
+             for (int i = 1; i <= 6; i++) {
+               cell = new PdfPCell(new Phrase("test"));              
+               cell.setCellEvent(border);
+               table.addCell(cell);
+             }
+
+             document.add(table);
+             document.close();
+     }
+}
+
+
+
+
+1.table 的高度计算问题,
+table 需要先添加到 document 中,才可以计算出高度,今后再添加行也可以计算出高度,
+代码如下:
+PdfPTable pdfPTable = new PdfPTable(2);
+		pdfPTable.setWidthPercentage(100);
+		PdfPCell pdfPCell = new PdfPCell(new Phrase("Page No ${writer.getPageNumber()}"));
+		pdfPTable.addCell(pdfPCell);
+		pdfPTable.addCell(pdfPCell);
+		document.add(pdfPTable);
+//		pdfPTable.completeRow();
+		System.out.println("height before add to document:" + pdfPTable.calculateHeights() + ", totalHeight is:" + pdfPTable.getTotalHeight());
+
+		System.out.println("height after add to document:" + pdfPTable.calculateHeights() + ", totalHeight is:" + pdfPTable.getTotalHeight());
+		pdfPTable.addCell(pdfPCell);
+		pdfPTable.completeRow();
+		System.out.println("height3 after add to document:" + pdfPTable.calculateHeights() + ", totalHeight is:" + pdfPTable.getTotalHeight());
+
+输出:
+height before add to document:16.0, totalHeight is:16.0
+height after add to document:16.0, totalHeight is:16.0
+height3 after add to document:32.0, totalHeight is:32.0
+
+某一行没添加完成时,不会有高度,可以用
+pdfPTable.completeRow();
+使得这一行完成,
+
+
+无法添加值进去,
+cell.addElement(new Phrase(""));
+
+
+span 需要默认读取父元素的值有:
+=============================================================
+paragraph.setAlignment(Element.ALIGN_CENTER);
+paragraph.setLeading(20);
+=============================================================
+
+span 需要默认读取父元素的值有:
+=============================================================
+new 两个chunk,
+Phrase add 这两个 chunk
+cell 再add phrase,
+是否会换行?
+不会换行,都在一行里面,当数量实在过多时,其会自动换行,
+=============================================================
+
+
+=============================================================
+new 两个chunk,
+Paragraph add 这两个 chunk
+cell 再add Paragraph,
+是否会换行?
+会一行行的换行,所以比较麻烦,
+不会换行,都在一行里面,当数量实在过多时,其会自动换行,
+=============================================================
+
+
+如果直接 add chunk 呢?
+=============================================================
+new 两个chunk,
+cell 再add chunk,
+是否会换行?
+会一行行的换行,所以比较麻烦,
+chunk.setLineHeight 会起作用,不管父级元素的高度,
+=============================================================
+
+因此,其需要用父元素,
+
+
+
+2.左下角的高度,用 line-height 试试看,		
+	<span value="ISSUED BY:" />
+	<span paddingLeft="60px" value="" textDecoration="underline" />
+	<span value="1" color="white" />
+	用大字体,会使得其底部的加宽变大,
+	用 lineHeight 呢?没效果,因此,只能暂时这样了,
+	div 的第一行的添加有问题,
+line Height 不起作用,
+
+
+

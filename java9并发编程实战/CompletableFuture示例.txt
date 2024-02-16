@@ -1,0 +1,419 @@
+参考:https://cloud.tencent.com/developer/article/1366581#:~:text=CompletableFuture%E5%9C%A8Java%E9%87%8C%E9%9D%A2%E8%A2%AB%E7%94%A8%E4%BA%8E%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B%EF%BC%8C%E5%BC%82%E6%AD%A5%E9%80%9A%E5%B8%B8%E6%84%8F%E5%91%B3%E7%9D%80%E9%9D%9E%E9%98%BB%E5%A1%9E%EF%BC%8C%E5%8F%AF%E4%BB%A5%E4%BD%BF%E5%BE%97%E6%88%91%E4%BB%AC%E7%9A%84%E4%BB%BB%E5%8A%A1%E5%8D%95%E7%8B%AC%E8%BF%90%E8%A1%8C%E5%9C%A8%E4%B8%8E%E4%B8%BB%E7%BA%BF%E7%A8%8B%E5%88%86%E7%A6%BB%E7%9A%84%E5%85%B6%E4%BB%96%E7%BA%BF%E7%A8%8B%E4%B8%AD%EF%BC%8C%E5%B9%B6%E4%B8%94%E9%80%9A%E8%BF%87,%E5%9B%9E%E8%B0%83%E5%8F%AF%E4%BB%A5%E5%9C%A8%E4%B8%BB%E7%BA%BF%E7%A8%8B%E4%B8%AD%E5%BE%97%E5%88%B0%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E6%89%A7%E8%A1%8C%E7%8A%B6%E6%80%81%EF%BC%8C%E6%98%AF%E5%90%A6%E5%AE%8C%E6%88%90%EF%BC%8C%E5%92%8C%E6%98%AF%E5%90%A6%E5%BC%82%E5%B8%B8%E7%AD%89%E4%BF%A1%E6%81%AF%E3%80%82CompletableFuture%E5%AE%9E%E7%8E%B0%E4%BA%86Future%2C%20CompletionStage%E6%8E%A5%E5%8F%A3%EF%BC%8C%E5%AE%9E%E7%8E%B0%E4%BA%86Future%E6%8E%A5%E5%8F%A3%E5%B0%B1%E5%8F%AF%E4%BB%A5%E5%85%BC%E5%AE%B9%E7%8E%B0%E5%9C%A8%E6%9C%89%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A1%86%E6%9E%B6%EF%BC%8C%E8%80%8CCompletionStage%E6%8E%A5%E5%8F%A3%E6%89%8D%E6%98%AF%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B%E7%9A%84%E6%8E%A5%E5%8F%A3%E6%8A%BD%E8%B1%A1%EF%BC%8C%E9%87%8C%E9%9D%A2%E5%AE%9A%E4%B9%89%E5%A4%9A%E7%A7%8D%E5%BC%82%E6%AD%A5%E6%96%B9%E6%B3%95%EF%BC%8C%E9%80%9A%E8%BF%87%E8%BF%99%E4%B8%A4%E8%80%85%E9%9B%86%E5%90%88%EF%BC%8C%E4%BB%8E%E8%80%8C%E6%89%93%E9%80%A0%E5%87%BA%E4%BA%86%E5%BC%BA%E5%A4%A7%E7%9A%84CompletableFuture%E7%B1%BB%E3%80%82
+
+示例1:
+
+CompletableFuture<String> completableFuture=new CompletableFuture<String>();
+Runnable runnable=new Runnable() {
+    @Override
+    public void run() {
+	try {
+	    TimeUnit.SECONDS.sleep(3);
+	    System.out.println(getThreadName()+"执行.....");
+	    completableFuture.complete("success");//在子线程中完成主线程completableFuture的完成
+
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
+    }
+};
+Thread t1=new Thread(runnable);
+t1.start();//启动子线程
+
+String result=completableFuture.get();//主线程阻塞，等待完成
+System.out.println(getThreadName()+"1x:  "+result);
+
+
+示例2:运行一个简单的没有返回值的异步任务
+CompletableFuture<Void> future=CompletableFuture.runAsync(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println(getThreadName()+"正在执行一个没有返回值的异步任务。");
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+future.get();
+System.out.println(getThreadName()+" 结束。");
+
+示例3:运行一个有返回值的异步任务
+CompletableFuture<String> future=CompletableFuture.supplyAsync(new Supplier<String>() {
+            @Override
+            public String get() {
+
+                try {
+                    System.out.println(getThreadName()+"正在执行一个有返回值的异步任务。");
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                return "OK";
+            }
+        });
+
+String result=future.get();
+
+System.out.println(getThreadName()+"  结果："+result);
+
+当然，上面默认的都是ForkJoinPool我们也可以换成Executor相关的Pool，其api都有支持如下：
+static CompletableFuture<Void>  runAsync(Runnable runnable)
+static CompletableFuture<Void>  runAsync(Runnable runnable, Executor executor)
+static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier)
+static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor)
+
+运行回调函数,thenApply(), thenAccept(), thenRun()
+
+1.thenApply(), 多次链式转化并返回最终的加工结果
+
+public static void asyncCallback() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> task=CompletableFuture.supplyAsync(new Supplier<String>() {
+            @Override
+            public String get() {
+                System.out.println(getThreadName()+"supplyAsync");
+                return "123";
+            }
+        });
+
+        CompletableFuture<Integer> result1 = task.thenApply(number->{
+            System.out.println(getThreadName()+"thenApply1");
+            return Integer.parseInt(number);
+        });
+
+        CompletableFuture<Integer> result2 = result1.thenApply(number->{
+            System.out.println(getThreadName()+"thenApply2");
+            return number*2;
+        });
+
+        System.out.println(getThreadName()+" => "+result2.get());
+}
+
+2.thenAccept(), 这个方法，可以接受Futrue的一个返回值，但是本身不在返回任何值，适合用于多个callback函数的最后一步操作使用。
+public static void asyncCallback2() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> task=CompletableFuture.supplyAsync(new Supplier<String>() {
+            @Override
+            public String get() {
+                System.out.println(getThreadName()+"supplyAsync");
+                return "123";
+            }
+        });
+
+        CompletableFuture<Integer> chain1 = task.thenApply(number->{
+            System.out.println(getThreadName()+"thenApply1");
+            return Integer.parseInt(number);
+        });
+
+        CompletableFuture<Integer> chain2 = chain1.thenApply(number->{
+            System.out.println(getThreadName()+"thenApply2");
+            return number*2;
+        });
+
+       CompletableFuture<Void> result=chain2.thenAccept(product->{
+           System.out.println(getThreadName()+"thenAccept="+product);
+       });
+
+	result.get();
+	System.out.println(getThreadName()+"end");
+}
+
+3.thenRun(), 这个方法与上一个方法类似，一般也用于回调函数最后的执行，但这个方法不接受回调函数的返回值，纯粹就代表执行任务的最后一个步骤：
+public  static void asyncCallback3() throws ExecutionException, InterruptedException {
+        CompletableFuture.supplyAsync(()->{
+            System.out.println(getThreadName()+"supplyAsync: 一阶段任务");
+            return null;
+        }).thenRun(()->{
+            System.out.println(getThreadName()+"thenRun: 收尾任务");
+        }).get();
+}
+
+
+每一步都支持异步运行,
+// thenApply() variants
+<U> CompletableFuture<U> thenApply(Function<? super T,? extends U> fn)
+<U> CompletableFuture<U> thenApplyAsync(Function<? super T,? extends U> fn)
+<U> CompletableFuture<U> thenApplyAsync(Function<? super T,? extends U> fn, Executor executor)
+
+public  static void asyncCallback4() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> ref1=  CompletableFuture.supplyAsync(()->{
+            try {
+                System.out.println(getThreadName()+"supplyAsync开始执行任务1.... ");
+//                TimeUnit.SECONDS.sleep(1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(getThreadName()+"supplyAsync: 任务1");
+            return null;
+        });
+
+        CompletableFuture<String> ref2= CompletableFuture.supplyAsync(()->{
+            try {
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(getThreadName()+"thenApplyAsync: 任务2");
+            return null;
+        });
+
+        CompletableFuture<String> ref3=ref2.thenApplyAsync(value->{
+            System.out.println(getThreadName()+"thenApplyAsync: 任务2的子任务");
+            return  null;
+        });
+
+        Thread.sleep(4000);
+        System.out.println(getThreadName()+ref3.get());
+}
+
+ForkJoinPool所有的工作线程都是守护模式的，也就是说如果主线程退出，那么整个处理任务都会结束，而不管你当前的任务是否执行完。
+如果需要主线程等待结束，可采用ExecutorsThreadPool，如下：
+
+ExecutorService pool = Executors.newFixedThreadPool(5);
+final CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+                ... }, pool);
+
+（4）thenCompose合并两个有依赖关系的CompletableFutures的执行结果
+
+public static void asyncCompose() throws ExecutionException, InterruptedException {
+        CompletableFuture<String>  future1=CompletableFuture.supplyAsync(new Supplier<String>() {
+            @Override
+            public String get() {
+                return "1";
+            }
+        });
+
+       CompletableFuture<String>nestedResult = future1.thenCompose(value->
+               CompletableFuture.supplyAsync(()->{
+                return value+"2";
+       }));
+
+        System.out.println(nestedResult.get());
+}
+
+（5）thenCombine合并两个没有依赖关系的CompletableFutures任务
+CompletableFuture<Double>  d1= CompletableFuture.supplyAsync(new Supplier<Double>() {
+        @Override
+        public Double get() {
+            return 1d;
+        }
+});
+
+CompletableFuture<Double>  d2= CompletableFuture.supplyAsync(new Supplier<Double>() {
+    @Override
+    public Double get() {
+	return 2d;
+    }
+});
+
+
+CompletableFuture<Double> result=  d1.thenCombine(d2,(number1,number2)->{
+    return  number1+number2;
+});
+
+System.out.println(result.get());
+
+（6）合并多个任务的结果allOf与anyOf
+allOf适用于，你有一系列独立的future任务，你想等其所有的任务执行完后做一些事情。
+举个例子，比如我想下载100个网页，传统的串行，性能肯定不行，这里我们采用异步模式，
+同时对100个网页进行下载，当所有的任务下载完成之后，我们想判断每个网页是否包含某个关键词。
+
+public static void mutilTaskTest() throws ExecutionException, InterruptedException {
+        //添加n个任务
+        CompletableFuture<Double> array[]=new CompletableFuture[3];
+        for ( int i = 0; i < 3; i++) {
+            array[i]=CompletableFuture.supplyAsync(new Supplier<Double>() {
+                @Override
+                public Double get() {
+                    return Math.random();
+                }
+            });
+        }
+
+       //获取结果的方式一
+//       CompletableFuture.allOf(array).get();
+//        for(CompletableFuture<Double> cf:array){
+//            if(cf.get()>0.6){
+//                System.out.println(cf.get());
+//            }
+//        }
+        //获取结果的方式二，过滤大于指定数字，在收集输出
+       List<Double> rs= Stream.of(array).map(CompletableFuture::join).filter(number->number>0.6).collect(Collectors.toList());
+       System.out.println(rs);
+}
+
+anyOf方法，也比较简单，意思就是只要在多个future里面有一个返回，整个任务就可以结束，而不需要等到每一个future结束。
+
+CompletableFuture<String> f1=CompletableFuture.supplyAsync(new Supplier<String>() {
+            @Override
+            public String get() {
+                try {
+                    TimeUnit.SECONDS.sleep(4);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return "wait 4 seconds";
+            }
+        });
+
+CompletableFuture<String> f2=CompletableFuture.supplyAsync(new Supplier<String>() {
+    @Override
+    public String get() {
+	try {
+	    TimeUnit.SECONDS.sleep(2);
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
+	return "wait 2 seconds";
+    }
+});
+
+
+CompletableFuture<String> f3=CompletableFuture.supplyAsync(new Supplier<String>() {
+    @Override
+    public String get() {
+	try {
+	    TimeUnit.SECONDS.sleep(4);
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
+	return "wait 10 seconds";
+    }
+});
+
+CompletableFuture<Object> result= CompletableFuture.anyOf(f1,f2,f3);
+
+System.out.println(result.get());
+
+（7）exceptionally异常处理
+int age=-1;
+CompletableFuture<String> task= CompletableFuture.supplyAsync(new Supplier<String>() {
+   @Override
+   public String get() {
+       if(age<0){
+	   throw new IllegalArgumentException("性别必须大于0");
+       }
+
+       if(age<18){
+	   return "未成年人";
+       }
+
+       return "成年人";
+   }
+}).exceptionally(ex->{
+   System.out.println(ex.getMessage());
+   return "发生 异常"+ex.getMessage();
+});
+
+System.out.println(task.get());
+
+此外还有另外一种异常捕捉方法handle，无论发生异常都会执行，示例如下：
+
+int age=10;
+CompletableFuture<String> task= CompletableFuture.supplyAsync(new Supplier<String>() {
+    @Override
+    public String get() {
+
+	if(age<0){
+	    throw new IllegalArgumentException("性别必须大于0");
+	}
+
+	if(age<18){
+	    return "未成年人";
+	}
+
+	return "成年人";
+    }
+}).handle((res,ex)->{
+    System.out.println("执行handle");
+    if(ex!=null){
+	System.out.println("发生异常");
+	return "发生 异常"+ex.getMessage();
+    }
+
+    return res;
+});
+
+System.out.println(task.get());
+
+
+参考:https://www.cnblogs.com/zhjh256/p/11829397.html
+CompletionService, JDK 8的CompletionService相对于之前版本的Future而言，其优势是能够尽可能快的得到执行完成的任务。
+例如有4个并发任务要执行，正常情况下通过Future.get()获取，
+通常只能按照提交的顺序获得结果，如果最后提交的最先完成的话，总执行时间会长很多。而通过CompletionService能够降低总执行时间，如下所示：
+
+
+
+package com.hundsun.ta.base.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+
+/**
+ * @author zjhua
+ * @description
+ * @date 2020/1/28 21:07
+ */
+public class CompletionServiceTest {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        testFuture();
+        testCompletionService();
+    }
+
+    //结果的输出和线程的放入顺序 有关(如果前面的没完成，就算后面的哪个完成了也得等到你的牌号才能输出！)，so阻塞耗时
+    public static void testFuture() throws InterruptedException, ExecutionException {
+        long beg = System.currentTimeMillis();
+        System.out.println("testFuture()开始执行：" + beg);
+        ExecutorService executor = Executors.newCachedThreadPool();
+        List<Future<String>> result = new ArrayList<Future<String>>();
+        for (int i = 5; i > 0; i--) {
+            Future<String> submit = executor.submit(new Task(i));
+            result.add(submit);
+        }
+        executor.shutdown();
+        for (int i = 0; i < 5; i++) {//一个一个等待返回结果
+            Thread.sleep(500);
+            System.out.println("线程" + i + "执行完成:" + result.get(i).get());
+        }
+        System.out.println("testFuture()执行完成:" + System.currentTimeMillis() + "," + (System.currentTimeMillis()-beg));
+    }
+
+    //结果的输出和线程的放入顺序 无关(谁完成了谁就先输出！主线程总是能够拿到最先完成的任务的返回值，而不管它们加入线程池的顺序)，so很大大缩短等待时间
+    private static void testCompletionService() throws InterruptedException, ExecutionException {
+        long beg = System.currentTimeMillis();
+        System.out.println("testFuture()开始执行：" + beg);
+        ExecutorService executor = Executors.newCachedThreadPool();
+        ExecutorCompletionService<String> completionService = new ExecutorCompletionService<>(executor);
+        for (int i = 5; i > 0; i--) {
+            completionService.submit(new Task(i));
+        }
+        executor.shutdown();
+        for (int i = 0; i < 5; i++) {
+            // 检索并移除表示下一个已完成任务的 Future，如果目前不存在这样的任务，则等待。
+            Future<String> future = completionService.take(); //这一行没有完成的任务就阻塞
+            Thread.sleep(500);
+            System.out.println("线程" + i + "执行完成:" + future.get());   // 这一行在这里不会阻塞，引入放入队列中的都是已经完成的任务
+        }
+        System.out.println("testFuture()执行完成:" + System.currentTimeMillis() + "," + (System.currentTimeMillis() - beg));
+    }
+
+    private static class Task implements Callable<String> {
+
+        private volatile int i;
+
+        public Task(int i) {
+            this.i = i;
+        }
+
+        @Override
+        public String call() throws Exception {
+            Thread.sleep(i*500);
+            return "任务 : " + i;
+        }
+
+    }
+}
+
+

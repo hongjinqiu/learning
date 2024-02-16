@@ -1,0 +1,26 @@
+https://www.cnblogs.com/lxwphp/p/15453281.html
+
+telnet 127.0.0.1 11211 连接 memcache
+
+stats 查看 memcache 状态
+
+3.获取/检查KeyValue
+get <key>*\r\n
+
+
+4.删除KeyValue：
+delete <key> <time>\r\n
+
+
+
+7.清空所有键值
+flush_all
+注：flush并不会将items删除，只是将所有的items标记为expired，因此这时memcache依旧占用所有内存。
+
+8、退出
+quit
+
+
+
+
+

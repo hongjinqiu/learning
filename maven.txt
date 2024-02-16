@@ -1,0 +1,10 @@
+http://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
+
+Guide to installing 3rd party JARs
+
+
+IDEA创建parent项目，聚合项目
+https://blog.csdn.net/fengchao2016/article/details/78664708
+
+
+

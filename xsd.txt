@@ -1,0 +1,82 @@
+属性赋值,
+<attribute name="mode" default="text" use="required">
+	<simpleType>
+		<restriction base="string">
+			<enumeration value="text" />
+			<enumeration value="js" />
+			<enumeration value="function" />
+		</restriction>
+	</simpleType>
+</attribute>
+
+元素赋值,
+<element name="id">
+	<simpleType>
+		<restriction base="string">
+			<minLength value="1"></minLength>
+		</restriction>
+	</simpleType>
+</element>
+
+<restriction base="string">
+	<pattern value="[A-A]" />
+</restriction>
+
+<restriction base="string">
+	<pattern value="[B-Z]" />
+</restriction>
+
+
+<restriction base="string">
+	<minLength value="1"></minLength>
+</restriction>
+
+<restriction base="string">
+	<enumeration value="FLOAT" />
+	<enumeration value="DOUBLE" />
+	<enumeration value="DECIMAL" />
+	<enumeration value="SHORT" />
+	<enumeration value="INT" />
+	<enumeration value="LONG" />
+	<enumeration value="NULL" />
+	<enumeration value="STRING" />
+	<enumeration value="DATE" />
+	<enumeration value="TIME" />
+	<enumeration value="TIMESTAMP" />
+	<enumeration value="BYTES" />
+</restriction>
+
+<restriction base="int">
+	<minInclusive value="1" />
+	<maxInclusive value="100000" />
+</restriction>
+
+加 pattern 来搞,
+
+组合类型:
+<simpleType>
+	<union>
+		<simpleType>
+			<restriction base="string">
+				<enumeration value="A0" />
+				<enumeration value="A1" />
+				<enumeration value="A0" />
+				<enumeration value="A1" />
+			</restriction>
+		</simpleType>
+		<simpleType>
+			<restriction base="string">
+				<pattern value="js:.+" />
+			</restriction>
+		</simpleType>
+	</union>
+</simpleType>
+
+
+
+
+
+
+
+
+

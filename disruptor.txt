@@ -1,0 +1,12 @@
+https://github.com/LMAX-Exchange/disruptor/wiki/Getting-Started
+
+利用 disruptor 中的 RingBuffer 来减少写入次数。
+
+LongEvent,
+
+LongEventFactory,
+
+LongEventHandler,
+
+
+

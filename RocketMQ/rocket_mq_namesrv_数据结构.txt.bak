@@ -1,0 +1,83 @@
+{
+  "brokerAddrTable": {
+    "broker-a": {
+      "cluster": "DefaultCluster",
+      "brokerName": "broker-a",
+      "brokerAddrs": {
+        "0": "172.19.224.1:10911"
+      },
+      "enableActingMaster": false
+    }
+  },
+  "clusterAddrTable": {
+    "DefaultCluster": [
+      "broker-a"
+    ]
+  }
+}
+
+
+brokerLiveTable: {
+        {
+                "brokerAddr":"192.168.1.1:10000",
+                "clusterName":"DefaultCluster",
+                "empty":false
+        }:{
+                "dataVersion":{
+                        "counter":0,
+                        "stateVersion":1,
+                        "timestamp":1518270318980
+	        },
+                "haServerAddr":"",
+                "heartbeatTimeoutMillis":1518270318980,
+                "lastUpdateTimestamp":1518270318980
+        }
+}
+
+filterServerTable: Broker上的FilterServer列表，消息过滤服务器列表，后续介绍Consumer时会介绍，
+consumer拉取数据是通过filterServer拉取，consumer向Broker注册。
+
+filterServerTable: {
+        {
+                "brokerAddr":"192.168.1.1:10000",
+                "clusterName":"DefaultCluster",
+                "empty":false
+        }:["xxxx"]
+}
+
+topicQueueMappingInfoTable: {
+    "topic1":{
+        "broker-a":{
+            "bname":"broker-a",
+            "currIdMap":{
+
+            },
+            "dirty":false,
+            "epoch":2,
+            "scope":"__global__",
+            "topic":"topic1",
+            "totalQueues":16
+        }
+    }
+}
+
+
+topicQueueTable: {
+    "topic1":{
+        "broker-b":{
+            "brokerName":"broker-b",
+            "perm":6,
+            "readQueueNums":4,
+            "topicSysFlag":0,
+            "writeQueueNums":4
+        },
+        "broker-a":{
+            "brokerName":"broker-a",
+            "perm":6,
+            "readQueueNums":4,
+            "topicSysFlag":0,
+            "writeQueueNums":4
+        }
+    }
+}
+

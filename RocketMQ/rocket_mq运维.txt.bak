@@ -1,0 +1,53 @@
+2.RocketMQ 运维相关,
+https://rocketmq.apache.org/zh/docs/deploymentOperations/01deploy
+
+
+1. RocketMQ-Dashboard 给跑起来, 看能不能 pull 出来,
+
+RocketMQ Dashboard
+
+拉取镜像,
+$ docker pull apacherocketmq/rocketmq-dashboard:latest
+
+docker 容器中运行,
+$ docker run -d --name rocketmq-dashboard -e "JAVA_OPTS=-Drocketmq.namesrv.addr=127.0.0.1:9876" -p 8080:8080 -t apacherocketmq/rocketmq-dashboard:latest
+
+
+docker run -d --name rocketmq-dashboard --network host -e "JAVA_OPTS=-Drocketmq.namesrv.addr=127.0.0.1:9876" -p 8080:8080 -t apacherocketmq/rocketmq-dashboard:latest
+
+
+mvn --setting C:\Users\hongjinqiu\.m2\settings_aliyun.xml 
+
+$ mvn clean package -Dmaven.test.skip=true
+
+git clone https://github.com/apache/rocketmq-dashboard.git
+
+git clone https://github.com/apache/rocketmq-exporter.git
+
+mvn clean package -Dmaven.test.skip=true
+
+$ java -jar target/rocketmq-dashboard-1.0.1-SNAPSHOT.jar
+
+java -jar target/rocketmq-exporter-0.0.2-SNAPSHOT-exec.jar
+
+java -jar rocketmq-dashboard-1.0.1-SNAPSHOT.jar
+
+java -jar rocketmq-exporter-0.0.2-SNAPSHOT-exec.jar
+
+
+
+
+2. RocketMQ Promethus Exporter, 这个应该是看指标的,
+
+
+两个 jar 位于:
+E:\hongjinqiu\soft\rocket_mq\rocketmq-dashboard-1.0.1-SNAPSHOT.jar
+E:\hongjinqiu\soft\rocket_mq\rocketmq-exporter-0.0.2-SNAPSHOT-exec.jar
+
+
+执行的 bat 位于:
+C:\Users\hongjinqiu\Desktop\rocketmq-dashboard.bat
+C:\Users\hongjinqiu\Desktop\rocketmq-exporter.bat
+
+
+

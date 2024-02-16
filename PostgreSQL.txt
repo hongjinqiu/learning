@@ -1,0 +1,71 @@
+http://www.postgres.cn/docs/9.5/tutorial-createdb.html
+
+1.创建数据库,
+createdb mydb
+
+2.删除数据库,
+dropdb mydb
+
+3.激活
+psql mydb
+
+4.select version()
+
+5.
+
+
+查看表大小, 从大到小排序,
+
+SELECT table_schema || '.' || table_name AS table_full_name, pg_size_pretty(pg_total_relation_size('"' 
+    || table_schema || '"."' || table_name || '"')) AS size
+FROM information_schema.tables
+ORDER BY
+pg_total_relation_size('"' || table_schema || '"."' || table_name || '"') DESC limit 20
+
+
+还可以批量更新，批量删除,
+https://developer.aliyun.com/article/74420
+
+批量更新
+
+test03=# update test set info=tmp.info from (values (1,'new1'),(2,'new2'),(6,'new6')) as tmp (id,info) where test.id=tmp.id;  
+UPDATE 3  
+test03=# select * from test;  
+ id |     info     |          crt_time            
+----+--------------+----------------------------  
+  3 | hello        | 2017-04-24 15:31:49.14291  
+  4 | digoal0123   | 2017-04-24 15:42:50.912887  
+  5 | hello digoal | 2017-04-24 15:57:29.622045  
+  1 | new1         | 2017-04-24 15:58:55.610072  
+  2 | new2         | 2017-04-24 15:28:20.37392  
+  6 | new6         | 2017-04-24 15:59:12.265915  
+(6 rows)
+
+postgresql 中的批量更新,
+
+
+
+
+理解 PostgreSQL 数据库索引
+https://blog.mastermind.dev/indexes-in-postgresql
+
+
+REST 和 gRPC 的详细比较（英文）
+https://kreya.app/blog/rest-vs-grpc/
+
+
+
+-- 底账库接口数据查询（读取购方和销方的开户行名称及账号信息）
+select query_result::json->'Data'->'Buyer'->>'AccountBank' as buyer_bank, query_result::json->'Data'->'Saler'->>'AccountBank' as saler_bank,
+           * from t_ai_prd_ticket_check_log
+where 1=1
+  and length(param_no) > 15
+  and ret_code='1001'
+  and query_channel in ('BAIWANG', 'GUOXIN')
+limit 10;
+
+
+PostgreSQL JSONB 使用入门（对json数据的 -> ->> 操作符有详细说明 ）	https://juejin.cn/post/6844903857009623048
+
+
+

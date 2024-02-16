@@ -1,0 +1,141 @@
+Spring AOP源码解析(一)
+https://www.jianshu.com/p/f2dc993b53f3
+
+参考这篇文章,
+
+The most popular mind map software are MindMaster, X Mind, 
+FreeMind and Mind Manager. 
+Among them. 
+Freemind is not currently used by few people because it’s out of date.
+
+PowerDesign, 
+
+简单地瞄一瞄, 看数据是如何进入的,
+
+
+Spring AOP源码解析(二)
+https://www.jianshu.com/p/e9ebe5ec4269
+
+
+Spring AOP源码解析(三)
+https://www.jianshu.com/p/25b9d022d0c8
+
+
+
+数据结构有哪些?
+
+AOP相关术语:
+1.关注点（Concern）：指系统中基于功能划分出的一部分，比如示例中的计算器和对它的性能统计
+2.横切关注点（Crosscutting concerns）：部分关注点横切程序中的多个模块，即施加在多个需要的模块上，它们就被称作横切关注点，比如示例中的性能统计
+3.连接点（Join point）：程序运行过程中的某个点，比如方法调用或处理异常。在spring-aop中，连接点始终代表方法调用，换句话说spring-aop是基于方法拦截的，
+比如示例中拦截了对位于 com.anyoptional.aop 包下所有类、所有方法的调用，这里，方法调用就是连接点,
+代码示例: 方法参数里面的 JoinPoint joinPoint,
+	@Before("annotationPointcut()")
+	public void beforePointcut(JoinPoint joinPoint) {
+
+	对应 spring-aop 中的源码:Joinpoint,
+	public interface Joinpoint {
+		Object proceed() throws Throwable;	// 处理这个 chain 的下个拦截器
+		Object getThis();			// 目标对象
+		AccessibleObject getStaticPart();	// 可获得以下的属性,
+		// 1. String targetMethodName
+		// 2.Class<?>[] types
+		// 3.Class<?> declaringType
+		The AccessibleObject class is the base class for Field, Method and Constructor objects. 
+		一个 AccessibleObject class 是 Field, Method, Constructor 的基类。
+		It provides the ability to flag a reflected object 
+			as suppressing default Java language access control checks when it is used. 
+		其提供了一个反射对象的能力, 当对象使用时, 控制这个对象的访问控制。
+
+		The access checks--for public, default (package) access, protected, and private members
+		--are performed when Fields, Methods or Constructors are used to set or get fields, to invoke methods, 
+		or to create and initialize new instances of classes, respectively.
+		public 对象, 包访问, 私有变量访问，构造函数等, 都会触发访问检查。
+
+		Setting the accessible flag in a reflected object permits sophisticated applications with sufficient privilege, 
+		such as Java Object Serialization or other persistence mechanisms, 
+		to manipulate objects in a manner that would normally be prohibited.
+		By default, a reflected object is not accessible.
+	}
+	public interface Invocation extends Joinpoint {
+		// 只有获取参数的一个方法
+		Object[] getArguments();
+	}
+	public interface MethodInvocation extends Invocation {
+		// 获取调用的这个方法
+		Method getMethod();
+	}
+
+4.增强（Advice）：在特定连接点上由某个切面持有的动作，比如示例中的doAround(...)，它为连接点添加了性能统计功能，我们就说它对连接点进行了增强。
+Advice的类型包括Around、Before和After，spring-aop将Advice建模为拦截器，并在连接点上维护了一个拦截器链
+代码示例:这个 Before 就是 Advice,
+	@Before("annotationPointcut()")
+	public void beforePointcut(JoinPoint joinPoint) {
+
+	// org.aopalliance.aop
+	public interface Advice {}	// 表明这是一个 advice
+	public interface Interceptor extends Advice {}	// 同样是一个标记接口，表示这是一个拦截器
+	public interface MethodInterceptor extends Interceptor {}	// 方法拦截器，拦截具体的方法
+
+
+5.引介（Introduction）：动态地给类添加方法或字段。
+spring-aop允许我们动态地给对象引入新的接口及其实现。
+这个示例中就没有啦，它有点像Swift中的extension ，只不过extension发生在编译期，
+更确切地说像ObjectiveC runtime中的class_addMethod(...)和objc_setAssociatedObject(...)
+
+6.切点（Pointcut）：匹配连接点的谓词。
+Advice与切点表达式相关联，并对任何匹配的连接点进行增强，比如示例中的切点选取了位于com.anyoptional.aop包下的所有类的所有方法
+代码示例:
+	@Pointcut("@annotation(com.onlyou.ai.autotrain.web.annotation.CheckClientId)")
+	public void annotationPointcut() {
+
+	}
+
+	对应 spring-aop 中的类,
+	// 在这个包下 org.springframework.aop
+	public interface Pointcut {
+		ClassFilter getClassFilter();		// 看名字, 过滤类的,
+		MethodMatcher getMethodMatcher();	// 看名字,方法匹配器，可以根据方法名、方法上的注解等信息来确定该方法是不是一个需要被增强的连接点
+		Pointcut TRUE = TruePointcut.INSTANCE;
+	}
+	public interface ClassFilter {// 判断给定的类或接口能否被切点所匹配
+		boolean matches(Class<?> clazz);
+	}
+	public interface MethodMatcher {
+		boolean matches(Method method, Class<?> targetClass);
+		boolean isRuntime();
+		boolean matches(Method method, Class<?> targetClass, Object... args);
+	}
+
+	有一个常见的 pointcut AnnotationMatchingPointcut, 开箱即用的 pointcut, running,-----------------------,
+		->	AnnotationsScanner.scan(criteria, this.element, this.searchStrategy, processor);
+
+	// 在这个包下: org.aspectj.lang.annotation,
+	public @interface Pointcut {
+		String value() default "";
+		String argNames() default "";
+	}
+
+7.切面（Aspect）：对跨越多个类型的关注点的模块化。比如示例中的性能统计切面， 它聚合了切点和增强，可以对匹配的任何连接点应用增强
+代码示例: CheckClientIdAspect, 这里面的 Aspect 注解,
+@Aspect
+@Component
+@SuppressWarnings({"unused"})
+@Order(0)	// 通过这个注解来配置 切面的顺序,
+public class CheckClientIdAspect {
+
+8.目标对象（Target object）：被一个或多个切面增强的对象。由于spring-aop是基于运行时动态代理的，因此目标对象就是被代理对象，比如示例中的AddCalculator实例
+
+名词就这些,
+1.关注点（Concern）
+2.横切关注点（Crosscutting concerns）
+
+
+
+
+
+
+
+
+
+

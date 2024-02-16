@@ -1,0 +1,35 @@
+https://www.tutorialspoint.com/groovy/index.htm
+
+脚本语言,
+
+is it possible that you have the rt.jar or any other class containing a java.lang class in your classpath?
+
+
+
+I have nothing in my classpath.
+
+If I change the startGroovy script to set TOOLS_JAR to the empty string, then I can run the various scripts. The darwin variant for TOOLS_JAR, /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Classes/classes.jar, has many classes in java.lang.
+
+This does not appear to be specific to jse 5.0 on the mac.
+
+If I change startGroovy to set TOOLS_JAR="$JAVA_HOME/../Classes/classes.jar", I get the same error regardless of whether JAVA_HOME is pointing to 1.4.2 or 1.5.0. Pointing JAVA_HOME at 1.3.1 gives me an UnsupportedClassVersionError, which is not unexpected since groovy requires jdk 1.4.
+
+Setting TOOLS_JAR= (ie setting it to nothing) and running groovysh shows either Version: 1.0-JSR-06 JVM: 1.5.0_06-64 or Version: 1.0-JSR-06 JVM: 1.4.2-54.
+
+
+
+
+CLASSPATH=%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar;%JAVA_HOME%\jre\lib\rt.jar;
+
+检查环境变量CLASSPATH，将其中的rt.jar和tools.jar的配置去掉后保存，重开窗口再次验证。
+
+groovy 要去掉这两个,喵的,
+
+看到了这一页,
+https://www.tutorialspoint.com/groovy/groovy_file_io.htm
+
+
+
+
+
+

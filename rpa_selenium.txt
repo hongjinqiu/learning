@@ -1,0 +1,269 @@
+需要问一问黄朝强
+
+rpa 与 selenium 的相关研究,
+
+测试账号:
+91350206303146883X/gfl2396888
+
+
+http://wsbsfwt1.xmtax.gov.cn:8001/
+这个是厦门税务局网站
+
+验证码截屏的方式,然后如何来识别,
+https://stackoverflow.com/questions/10848900/how-to-take-partial-screenshot-frame-with-selenium-webdriver/10849914
+
+
+隐藏 selenium 窗口,
+https://stackoverflow.com/questions/1418082/is-it-possible-to-hide-the-browser-in-selenium-rc
+
+
+https://stackoverflow.com/questions/7531507/selenium-webdriver-multi-threading-browser-hiding-using-java
+Selenium 多线程,
+I can give you an answer to your first question.
+Yes, you can run multiple driver instances simultaneously. 
+However it is not recommended to run more than 5 or so instances at once in a single selenium server. 
+Selenium Grid was designed specifically for this (it is bundled with the Selenium Server).
+
+
+
+工程地址:
+
+E:\hongjinqiu\soft\rpa\RPA-Demo
+
+工程的简单分析:
+入口:
+org/webdriver/patatiumwebui/TestNGApplication.java
+
+1. TestNG 是一个测试 Java 应用程序的新框架,允许传递不同的参数,而运行对应的程序,
+2. 加载对应的 xml,
+xml 的格式长这样:
+<suite name="Suite">
+	<parameter 
+	<listeners><!-- 监听器设置-->
+		<listener class-name="org.webdriver.patatiumwebui.utils.TestListener"></listener>
+		<listener class-name="org.webdriver.patatiumwebui.utils.TestReport"></listener>
+	</listeners>
+
+	<test name="登录成功并进入渠道编辑的测试用例">
+		<classes>
+			<class name="org.webdriver.patatiumwebui.Test.JinShuiTest">
+			</class>
+		</classes>
+	</test>
+
+2.1. listener 是什么东东?
+
+是一个自动化的工程,当测试失败时,记录下失败的信息,并且不再往下执行,
+	public class TestListener  extends TestListenerAdapter{
+		onTestFailure,
+		onTestSkipped,
+		onTestSuccess,
+		getKeyStackTrace,
+	public class TestReport implements IReporter{,	testNG 的东东,
+		wwww,
+
+	public class JinShuiTest extends TestBaseCase {,		相当于一个入口,
+		public Object[][] loginData()	没做什么事情,但是作为一个 DataProvider,给下面的方法提供数据,
+		public void login (String userName,String password,String message) throws IOException, DocumentException {
+			->LoginJinShuiAction jinshuiAction=new LoginJinShuiAction(BaseUrl,userName,password);
+			->jinshuiAction.ListTableAction();
+
+	public class LoginJinShuiAction extends TestBaseCase {
+		LoginJinShuiPage loginPage=new LoginJinShuiPage();
+		loginPage.open(Url);
+		System.out.println(driver.getCurrentUrl());		// 父类的 public static WebDriver driver;
+		ElementAction action=new ElementAction();		// 找元素用的,
+		action.sleep(5);
+		action.click(loginPage.密码输入框1());
+		action.sleep(1);
+		action.type(loginPage.密码输入框(),PassWord);		// 输入值,
+		action.click(loginPage.登录按钮());			// 点完后,要 sleep 一下,
+
+
+		WebElement table=action.findElement(page.查询结果table());
+		List<WebElement> rows = table.findElements(By.tagName("tr"));	// ElementAction,WebElement,
+
+	代码自动生成如何来折腾呢?
+	LoginJinShuiPage
+	PageObjectAutoCodeJinShui,
+	UILibraryJinShui.xml,
+		从参数里面读取数据,
+		String BaseUrl= XmlReadUtil.getTestngParametersValue("testngJinShui.xml","BaseUrl");
+	
+
+
+用 xpath 来查找元素,
+ElementAction.switchToWindow,
+
+如果执行失败,用 Assertxxxx,来查找元素,
+
+读取 excel,
+读取 xml,
+
+frame 切换,
+
+自动生成 Page 的内容,
+
+
+1.写一个生成器,
+2.查找东东,可输入,
+3.往哪个地方写值,
+//*[@id="loginId"]
+
+//*[@id="userPassword"]
+
+//*[@id="checkCode"]
+
+//*[@id="qy_submit"]
+
+
+要有版本?
+
+ocr 的相关折腾 ,
+
+
+找到窗口,
+
+鼠标经过,不知道要怎么说,
+
+看一看这个 
+String[] handls=new String[driver.getWindowHandles().size()];
+driver.getWindowHandles().toArray(handls);
+
+handls 是个什么东东?
+
+能不能用 name 呢?
+
+背景页 title:			<title>厦门市税务局数字签名验证程序</title>
+弹出页 title:			<title>厦门税务</title>
+点击申请报税后 title:		<title>首页</title>
+
+<title>厦门市网上税务局</title>
+
+所以用 title 应该是可以找得到吧,我就用 title 好了,
+
+不行,只能,用 i 来切换,
+
+// driver.getTitle()
+
+然后要切换窗口,
+
+1.点击申请报税按钮,
+2.点击
+
+
+WebDriverWait wait = new WebDriverWait(driver, 20);
+wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".red_box")));
+
+// 下面这个方法不行,直接报错了,
+action.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(indexXmTaxPage.mainFrame().getElement()), 20);// 报错了,如果直接定位 iframe 呢?
+
+等待某个元素或其它的条件,
+
+alert 点击,
+String content = action.getAlertText();
+action.alertConfirm();
+
+
+
+最常报的：1、财务报表，主要为：资产负债表、利润表、现金流量表；（有分月报、季报、年报，格式都不同。有些区域的现金流量表不用报）
+2、增值税（含附加税）（有月报、有季报）				-----
+3、企业所得税（一般为季报，有分A类和B类，不同的报表格式）、	-----
+4、个人所得税（每月报）；				-----
+5、印花税（一般为月报，但并不是每家企业必报）		-----
+6、文化事业建设费；（视企业性质报；）			-----
+7、地方各项基金费；（视企业性质报；）			-----	7 地方各项基金会对应 工费经费。
+8、消费税；（视企业性质报）				-----
+9、社保。（有些企业是税务代缴）				
+主要这9种。基本能覆盖95%
+
+
+1.先不做,已经有了,
+
+申请报税,
+applyTax
+
+10.切换到新窗口的代码,要如何来实现?
+
+
+
+
+第一个页面打开时间:
+
+1537942777268-1537942777226 = 42
+1537942781597-1537942781587 = 10
+
+
+查找 iframe 并等待完成,finish,
+
+找到链接并点击其,
+
+
+厦门增值税流程_201809.docx, 阅读完了,
+
+还要点击确认按钮,悟了,就这样了,
+
+
+1.Selenium 的 alert 弹出框的点击,
+	action.alertConfirm();
+	// test 中,
+	1.在登录页面给其点击掉 alert,测试,
+2.文件的上传,如何来选择点击上传控件,
+	running,--------------------------,
+	https://www.cnblogs.com/linxinmeng/p/6950173.html
+	1.普通上传,
+	2.插件上传,
+	普通上传的折腾,
+	因此,我还是要瞄 HDFS 的内容,
+
+做那个一键报锐,整出 增值税，附加税，印花税，工费经费 各个单独的入口,
+
+1.增值税,
+	《增值税纳税申报表（小规模纳税人适用）》
+	《增值税纳税申报表（小规模纳税人适用）附列资料》		第一步点这个,
+		点击完保存后,还有有弹出框需要点击吗?
+		出现已保存后,其 url 依旧相同,
+		那右侧的保存按钮呢?					也是依旧相同,
+		点它,							running,-------------------------,
+		1.勾选"是否采用_主附税一体化申报缴税功能",
+		2.点击弹窗的确定,
+
+		截图的代码,用的是哪一个,shootWebElement,
+	《增值税减免税申报明细表（小规模纳税人适用）》			
+		正式申报,						这个不能点,
+正式申报
+	org.webdriver.patatiumwebui.action.AddedValueTaxXmTaxAction,
+	org.webdriver.patatiumwebui.pageObject.AddedValueTaxXmTaxPage,
+	finish,
+2.附加税,
+	running,--------------------------,
+	找一找,真麻烦,
+3.印花税,
+	running,--------------------------,
+	StampTaxXmTaxAction,
+	StampTaxXmTaxPage,
+	UILibraryXmTax.xml,里面添加对应的内容,
+
+	页面结构,
+	top->iframe(id=iframe1)->左侧菜单
+				->右侧 iframe,main,
+	//*[@id='iframe1']
+	//*[@id='main']
+4.工会经费,
+
+在点击最后一步之前,
+
+selenium 下载地址,
+
+http://chromedriver.storage.googleapis.com/index.html
+
+http://npm.taobao.org/mirrors/chromedriver/
+
+国内 chrome 下载地址:
+https://tools.shuax.com/chrome/#/
+
+
+
+
+
+

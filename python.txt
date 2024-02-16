@@ -1,0 +1,15 @@
+python multipart 上传文件
+
+
+import requests
+url = 'http://172.16.19.101:9090/onlyou/docs_detection_and_recognition'
+
+files={'F_recog_general_detail':'1',
+    'imagefile':('invoice2.jpg',open(r'E:\hongjinqiu\tmp\增值税发票测试\invoice2.jpg','rb'),'application/octet-stream')
+}
+response=requests.post(url,files=files)
+print(response.text)
+
+
+
+

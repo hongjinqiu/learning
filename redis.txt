@@ -1,0 +1,400 @@
+https://www.json.cn/jiaocheng/redis/
+
+redis 默认有 0-16 号数据库
+
+使用 select <ID> 可以切换数据库.
+例如 
+1.
+select 0
+2.
+select 1
+
+
+Redis自增原子性是通过使用Redis的INCR命令实现的。INCR命令是原子性的，它可以保证在多个客户端同时对同一个key进行自增操作时。
+
+
+它通常被称为数据结构服务器，因为值（value）可以是 字符串(String), 哈希(Hash), 列表(list), 集合(sets) 和有序集合(sorted sets)等类型。
+
+Redis支持数据的备份，即master-slave模式的数据备份。
+
+
+redis 也支持事务, 多个操作通过MULTI和EXEC指令包起来
+
+丰富的特性 – Redis还支持 publish/subscribe, 通知, key 过期等等特性。
+
+设值:
+set mykey abc
+
+取值:
+get mykey
+
+删除值:
+del mykey
+
+查看或设置配置项
+CONFIG GET CONFIG_SETTING_NAME
+
+CONFIG GET * // 查看所有的配置项
+
+CONFIG GET loglevel
+
+CONFIG SET CONFIG_SETTING_NAME NEW_CONFIG_VALUE
+
+
+redis.conf 配置项说明如下：
+
+loglevel notice 指定日志记录级别，Redis 总共支持四个级别：debug、verbose、notice、warning，默认为 notice
+
+
+logfile stdout 日志记录方式，默认为标准输出，如果配置 Redis 为守护进程方式运行，而这里又配置为日志记录方式为标准输出，则日志将会发送给 /dev/null
+
+
+rdbcompression yes	
+指定存储至本地数据库时是否压缩数据，默认为 yes，Redis 采用 LZF 压缩，如果为了节省 CPU 时间，可以关闭该选项，但会导致数据库文件变的巨大
+
+config get rdbcompression
+
+设置同一时间最大客户端连接数，默认无限制，Redis 可以同时打开的客户端连接数为 Redis 进程可以打开的最大文件描述符数，
+如果设置 maxclients 0，表示不作限制。当客户端连接数到达限制时，Redis 会关闭新的连接并向客户端返回 max number of clients reached 错误信息
+
+指定 Redis 最大内存限制，Redis 在启动时会把数据加载到内存中，达到最大内存后，Redis 会先尝试清除已到期或即将到期的 Key，
+当此方法处理 后，仍然到达最大内存设置，将无法再进行写入操作，但仍然可以进行读取操作。
+Redis 新的 vm 机制，会把 Key 存放内存，Value 会存放在 swap 区
+
+
+指定是否在每次更新操作后进行日志记录，Redis 在默认情况下是异步的把数据写入磁盘，如果不开启，可能会在断电时导致一段时间内的数据丢失。
+因为 redis 本身同步数据文件是按上面 save 条件来同步的，所以有的数据会在一段时间内只存在于内存中。默认为 no
+
+
+vm-enabled no 指定是否启用虚拟内存机制，默认值为 no，简单的介绍一下，VM 机制将数据分页存放，
+由 Redis 将访问量较少的页即冷数据 swap 到磁盘上，访问多的页面由磁盘自动换出到内存中（在后面的文章我会仔细分析 Redis 的 VM 机制）
+
+
+vm-max-memory 0	将所有大于 vm-max-memory 的数据存入虚拟内存，无论 vm-max-memory 设置多小，所有索引数据都是内存存储的(Redis 的索引数据 就是 keys)，
+也就是说，当 vm-max-memory 设置为 0 的时候，其实是所有 value 都存在于磁盘。默认值为 0
+
+
+1.
+Redis 数据类型
+Redis支持五种数据类型：string（字符串），hash（哈希），list（列表），set（集合）及zset(sorted set：有序集合)。
+
+hash 设值例子, 用 hset, hget
+redis 127.0.0.1:6379> DEL json
+redis 127.0.0.1:6379> HMSET json field1 "Hello" field2 "World"
+"OK"
+redis 127.0.0.1:6379> HGET json field1
+"Hello"
+redis 127.0.0.1:6379> HGET json field2
+"World"
+
+HGETALL jsonkey
+
+1.1.
+list（列表）取写值例子,
+redis 127.0.0.1:6379> DEL json
+redis 127.0.0.1:6379> lpush json redis
+(integer) 1
+redis 127.0.0.1:6379> lpush json mongodb
+(integer) 2
+redis 127.0.0.1:6379> lpush json rabitmq
+(integer) 3
+redis 127.0.0.1:6379> lrange json 0 10
+1) "rabitmq"
+2) "mongodb"
+3) "redis"
+redis 127.0.0.1:6379>
+
+1.2.
+Set（集合）
+Redis 的 Set 是 string 类型的无序集合。
+
+集合是通过哈希表实现的，所以添加，删除，查找的复杂度都是 O(1)。
+
+sadd key member
+redis 127.0.0.1:6379> DEL json
+redis 127.0.0.1:6379> sadd json redis
+(integer) 1
+redis 127.0.0.1:6379> sadd json mongodb
+(integer) 1
+redis 127.0.0.1:6379> sadd json rabitmq
+(integer) 1
+redis 127.0.0.1:6379> sadd json rabitmq
+(integer) 0
+redis 127.0.0.1:6379> smembers json
+
+1) "redis"
+2) "rabitmq"
+3) "mongodb"
+
+
+1.3.
+zset(sorted set：有序集合)
+
+redis 127.0.0.1:6379> DEL json
+redis 127.0.0.1:6379> zadd json 0 redis
+(integer) 1
+redis 127.0.0.1:6379> zadd json 0 mongodb
+(integer) 1
+redis 127.0.0.1:6379> zadd json 0 rabitmq
+(integer) 1
+redis 127.0.0.1:6379> zadd json 0 rabitmq
+(integer) 0
+redis 127.0.0.1:6379> > ZRANGEBYSCORE json 0 1000
+1) "mongodb"
+2) "rabitmq"
+3) "redis"
+
+
+列出所有的key
+keys *
+
+查看指定key所有的字段和值
+hgetall project
+
+查看字段的类型,
+type [key]
+
+
+看到了,
+https://www.json.cn/jiaocheng/co-2313.html
+
+
+
+如果需要在远程 redis 服务上执行命令，同样我们使用的也是 redis-cli 命令。
+$ redis-cli -h host -p port -a password
+
+1.该命令用于在 key 存在时删除 key。
+DEL key
+
+2.序列化给定 key ，并返回被序列化的值。
+DUMP key
+
+3.检查给定 key 是否存在。
+EXISTS key
+
+4.为给定 key 设置过期时间，以秒计。
+EXPIRE key seconds
+
+5.EXPIREAT 的作用和 EXPIRE 类似，都用于为 key 设置过期时间。 不同在于 EXPIREAT 命令接受的时间参数是 UNIX 时间戳(unix timestamp)。
+EXPIREAT key timestamp
+
+6.设置 key 的过期时间以毫秒计。
+PEXPIRE key milliseconds
+
+7.设置 key 过期时间的时间戳(unix timestamp) 以毫秒计
+PEXPIREAT key milliseconds-timestamp
+
+8.查找所有符合给定模式( pattern)的 key 。
+KEYS pattern
+
+9.将当前数据库的 key 移动到给定的数据库 db 当中。
+MOVE key db
+
+10.移除 key 的过期时间，key 将持久保持。
+PERSIST key
+
+11.以毫秒为单位返回 key 的剩余的过期时间。
+PTTL key
+
+12.以秒为单位，返回给定 key 的剩余生存时间(TTL, time to live)。
+TTL key
+
+13.从当前数据库中随机返回一个 key 。
+RANDOMKEY
+
+14.修改 key 的名称
+RENAME key newkey
+
+15.仅当 newkey 不存在时，将 key 改名为 newkey 。
+RENAMENX key newkey
+
+16.迭代数据库中的数据库键。
+SCAN cursor [MATCH pattern] [COUNT count]
+
+17.返回 key 所储存的值的类型。
+TYPE key
+
+18.将 key 中储存的数字值减一。
+DECR key
+
+19.key 所储存的值减去给定的减量值（decrement） 。
+DECRBY key decrement
+
+20.如果 key 已经存在并且是一个字符串， APPEND 命令将指定的 value 追加到该 key 原来值（value）的末尾。
+APPEND key value
+
+
+redis hash 基本的相关命令：
+1.删除一个或多个哈希表字段
+HDEL key field1 [field2]
+
+2.查看哈希表 key 中，指定的字段是否存在。
+HEXISTS key field
+
+3.获取存储在哈希表中指定字段的值。
+HGET key field
+
+4.获取在哈希表中指定 key 的所有字段和值
+HGETALL key
+
+5.为哈希表 key 中的指定字段的整数值加上增量 increment 。
+HINCRBY key field increment
+
+6.为哈希表 key 中的指定字段的浮点数值加上增量 increment 。
+HINCRBYFLOAT key field increment
+
+7.获取所有哈希表中的字段
+HKEYS key
+
+8.获取哈希表中字段的数量
+HLEN key
+
+9.获取所有给定字段的值
+HMGET key field1 [field2]
+
+10.同时将多个 field-value (域-值)对设置到哈希表 key 中。
+HMSET key field1 value1 [field2 value2 ]
+
+11.将哈希表 key 中的字段 field 的值设为 value 。
+HSET key field value
+
+12.只有在字段 field 不存在时，设置哈希表字段的值。
+HSETNX key field value
+
+13.获取哈希表中所有值。
+HVALS key
+
+14.迭代哈希表中的键值对。
+HSCAN key cursor [MATCH pattern] [COUNT count]
+
+列表命令相关,
+
+1	BLPOP key1 [key2 ] timeout
+移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止。
+2	BRPOP key1 [key2 ] timeout
+移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止。
+3	BRPOPLPUSH source destination timeout
+从列表中弹出一个值，将弹出的元素插入到另外一个列表中并返回它； 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止。
+4	LINDEX key index
+通过索引获取列表中的元素
+5	LINSERT key BEFORE|AFTER pivot value
+在列表的元素前或者后插入元素
+6	LLEN key
+获取列表长度
+7	LPOP key
+移出并获取列表的第一个元素
+8	LPUSH key value1 [value2]
+将一个或多个值插入到列表头部
+9	LPUSHX key value
+将一个值插入到已存在的列表头部
+10	LRANGE key start stop
+获取列表指定范围内的元素
+11	LREM key count value
+移除列表元素
+12	LSET key index value
+通过索引设置列表元素的值
+13	LTRIM key start stop
+对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除。
+14	RPOP key
+移除列表的最后一个元素，返回值为移除的元素。
+15	RPOPLPUSH source destination
+移除列表的最后一个元素，并将该元素添加到另一个列表并返回
+16	RPUSH key value1 [value2]
+在列表中添加一个或多个值
+17	RPUSHX key value
+为已存在的列表添加值
+
+
+集合相关的操作,
+
+1	SADD key member1 [member2]
+向集合添加一个或多个成员
+2	SCARD key
+获取集合的成员数
+3	SDIFF key1 [key2]
+返回给定所有集合的差集
+4	SDIFFSTORE destination key1 [key2]
+返回给定所有集合的差集并存储在 destination 中
+5	SINTER key1 [key2]
+返回给定所有集合的交集
+6	SINTERSTORE destination key1 [key2]
+返回给定所有集合的交集并存储在 destination 中
+7	SISMEMBER key member
+判断 member 元素是否是集合 key 的成员
+8	SMEMBERS key
+返回集合中的所有成员
+9	SMOVE source destination member
+将 member 元素从 source 集合移动到 destination 集合
+10	SPOP key
+移除并返回集合中的一个随机元素
+11	SRANDMEMBER key [count]
+返回集合中一个或多个随机数
+12	SREM key member1 [member2]
+移除集合中一个或多个成员
+13	SUNION key1 [key2]
+返回所有给定集合的并集
+14	SUNIONSTORE destination key1 [key2]
+所有给定集合的并集存储在 destination 集合中
+15	SSCAN key cursor [MATCH pattern] [COUNT count]
+迭代集合中的元素
+
+
+有序集合
+1	ZADD key score1 member1 [score2 member2]
+向有序集合添加一个或多个成员，或者更新已存在成员的分数
+2	ZCARD key
+获取有序集合的成员数
+3	ZCOUNT key min max
+计算在有序集合中指定区间分数的成员数
+4	ZINCRBY key increment member
+有序集合中对指定成员的分数加上增量 increment
+5	ZINTERSTORE destination numkeys key [key ...]
+计算给定的一个或多个有序集的交集并将结果集存储在新的有序集合 key 中
+6	ZLEXCOUNT key min max
+在有序集合中计算指定字典区间内成员数量
+7	ZRANGE key start stop [WITHSCORES]
+通过索引区间返回有序集合指定区间内的成员
+8	ZRANGEBYLEX key min max [LIMIT offset count]
+通过字典区间返回有序集合的成员
+9	ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT]
+通过分数返回有序集合指定区间内的成员
+10	ZRANK key member
+返回有序集合中指定成员的索引
+11	ZREM key member [member ...]
+移除有序集合中的一个或多个成员
+12	ZREMRANGEBYLEX key min max
+移除有序集合中给定的字典区间的所有成员
+13	ZREMRANGEBYRANK key start stop
+移除有序集合中给定的排名区间的所有成员
+14	ZREMRANGEBYSCORE key min max
+移除有序集合中给定的分数区间的所有成员
+15	ZREVRANGE key start stop [WITHSCORES]
+返回有序集中指定区间内的成员，通过索引，分数从高到低
+16	ZREVRANGEBYSCORE key max min [WITHSCORES]
+返回有序集中指定分数区间内的成员，分数从高到低排序
+17	ZREVRANK key member
+返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
+18	ZSCORE key member
+返回有序集中，成员的分数值
+19	ZUNIONSTORE destination numkeys key [key ...]
+计算给定的一个或多个有序集的并集，并存储在新的 key 中
+20	ZSCAN key cursor [MATCH pattern] [COUNT count]
+迭代有序集合中的元素（包括元素成员和元素分值）
+
+
+Redis 在 2.8.9 版本添加了 HyperLogLog 结构。
+用来做基数统计的算法,
+Redis HyperLogLog 是用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定 的、并且是很小的。
+
+
+发布,订阅
+Redis 发布订阅(pub/sub)是一种消息通信模式：发送者(pub)发送消息，订阅者(sub)接收消息。
+
+订阅方,几个 redis-cli,
+
+看到了这一页,订阅的相关实现,
+https://www.json.cn/jiaocheng/co-2322.html
+
+
+
+

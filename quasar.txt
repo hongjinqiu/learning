@@ -1,0 +1,194 @@
+https://github.com/puniverse/quasar
+
+运行时，需要加这个参数，
+-javaagent:path-to-quasar-jar.jar
+
+文档,
+http://docs.paralleluniverse.co/quasar/
+
+使用Kafka和ZeroMQ实现分布式Quasar Actor,
+https://www.jdon.com/artichect/distributed-quasar-actors-kafka-zeromq.html
+
+
+http://blog.paralleluniverse.co/2014/05/01/modern-java/
+对应的翻译页面:
+https://www.cnblogs.com/htoooth/p/8757644.html
+
+管理 Fiber 的线程池，
+https://stackoverflow.com/questions/39927464/quasar-fiber-equivalent-of-javas-threadpoolexecutor
+	FiberExecutorScheduler scheduler = new FiberExecutorScheduler("FibersInAPool", executor);
+	for (int i = 0; i < 100; i++) {
+		Fiber fiber = new Fiber<Void>(scheduler, new SuspendableCallable<Void>() {
+			@Override
+			public Void run() throws SuspendExecution, InterruptedException {
+				// run some code
+				return null;
+			}
+		});
+		fiber.start();
+	}
+
+
+Coroutine in Java协程 - Quasar Fiber实现-优
+https://my.oschina.net/u/561701/blog/1573568
+这一篇可以阅读,
+
+http://blog.paralleluniverse.co/2014/02/06/fibers-threads-strands/
+
+
+vert.x 的东东,
+次时代Java编程(一)：续 vertx-sync实践
+https://segmentfault.com/a/1190000006098059
+
+
+在我的　gitee 上有，
+https://gitee.com/profile
+但是要 jdk11
+
+
+
+git clone https://github.com/puniverse/quasar-mvn-archetype
+cd quasar-mvn-archetype
+mvn install
+cd ..
+mvn archetype:generate -DarchetypeGroupId=co.paralleluniverse -DarchetypeArtifactId=quasar-mvn-archetype -DarchetypeVersion=0.7.4 -DgroupId=testgrp -DartifactId=testprj
+cd testprj
+mvn test
+mvn clean compile dependency:properties exec:exec
+
+
+Channel
+Actor
+Reactive Stream
+
+
+Comsat 还是 Parallel Universe提供的集成Quasar的一套开源库，可以提供web或者企业级的技术，如HTTP服务和数据库访问。
+
+
+
+1.Fiber 的实现,要采用 Fiber 类,
+
+new Fiber<V>() {
+  @Override
+  protected V run() throws SuspendExecution, InterruptedException {
+        // your code
+    }
+}.start();
+
+
+new Fiber<Void>(new SuspendableRunnable() {
+  public void run() throws SuspendExecution, InterruptedException {
+    // your code
+  }
+}).start();
+
+
+一个方法可以被 fiber 运行,需要 
+添加 @Suspendable 注解
+或者声明 throws SuspendExecution
+
+2.Channels
+2.1.Sending and Receiving Messages
+2.2.Primitive Channels
+	int, long, float and double 这四种称为 primitive channel,不允许有多消费者.
+2.3.Ticker Channels
+	用 DISPLACE overflow policy 创建的 channel 为
+	放入这个 channel 的 message 为有序，但是其有 limit windows size，消息可能会丢失。
+	适合那种周期性广播的场景。
+	ticker channel 只允许有一个消费者。
+	但是可以为这个 channel 创建多个 view，例如:
+2.4.Transforming Channels
+	转换的 channel,提供了各种方法:
+	map,转换,
+	filter,
+	flatMap,
+	reduce,
+	zip,
+	take,
+	group,
+	Channels.fiberTransform
+2.5.Channel Selection
+	类似 go 语言中的 select,哪个 channel 好了，就用哪个,
+	SelectAction sa = Selector.select(Selector.receive(ch1), Selector.send(ch2, msg));
+
+2.6.Dataflow (Reactive):
+	Val 是一个 dataflow constant 常量,可设一次，而读多次。
+	Var 是一个数据流变量，可赋值多次。
+	每次的赋值，都会引起其它 Var 值的变化。
+	
+
+3.Actor
+传统多数流行的语言并发是基于多线程之间的共享内存，使用同步方法防止写争夺，Actors使用消息模型，
+每个Actors在同一时间处理最多一个消息，可以发送消息给其他Actors，保证了单独写原则 。从而巧妙避免了多线程写争夺。
+
+继承自 Actor 类，要传一个 MailboxConfig 的配置,
+
+推荐使用 BasicActor,来替换 Actor.
+
+actor 可以跑成 Fiber,也可以跑成 thread,
+
+Creating Actors
+
+
+Spawning Actors
+	actor.spawn()
+	actor.spawnThread()
+
+Sending and Receiving Messages,
+	ActorRef,
+
+
+Selective Receive
+	就是个状态机,
+
+继续 gogogogo,
+
+在 doc 的底部,
+Fiber tests				running,----------------------------,
+	vert.x 的测试,
+FiberAsync tests
+IO tests
+Channel tests
+Actor tests
+Server behavior tests
+Proxy server test
+EventSource tests
+Supervisor tests
+Reactive Streams tests
+
+
+
+quasar 会对我们的代码进行static call-site分析，在必要的地方织入用于保存和恢复调用栈的代码。
+哪些方法需要instrument?
+	方法带有Suspendable 注解
+	方法带有SuspendExecution
+park,unpark,
+
+Fiber 的几个方法,
+start:调用task的submit，提交给scheduler运行
+
+exec:
+
+park:暂停当前fiber的执行，并交出执行权,
+
+unpark:
+
+这里除了手工调用fiber的park,unpark来暂停和恢复fiber外，可以用FiberAsync类来将基于callback的异步调用封装成fiber blocking，
+基于fiber的第三方库comsat就是通过将bio替换成nio，然后再封装成FiberAsync来实现的,FiberAsync可参考http://blog.paralleluniverse....
+
+可以将异步的 api，封装成 FiberAsync,形成 Fiber block io,
+
+就可以封装成 同步的了，然后再瞄一瞄 comsat 是如何来实现的,
+
+下一步就是读 Comsat 的东东,还是直接读 vert.x 来得直接,
+
+跑一跑 FiberAsync,
+
+Strand.currentStrand(),
+
+comsat 的应用,
+
+查一查这笔数据，其增值税通过后，发生了什么,
+
+
+

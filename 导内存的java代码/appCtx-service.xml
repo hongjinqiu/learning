@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd"
+	default-lazy-init="true">
+
+	<!-- ============================================ OVERSEA VOP start=====================================-->
+	<!--ssm start  系统（权限、消息）模块-->
+	<dubbo:service interface="com.onlyou.oversea.vop.ssm.service.IOperaNoticeService" ref="operaNoticeService"/>
+	<dubbo:service interface="com.onlyou.oversea.vop.ssm.service.IPartnerUserService" ref="partnerUserService" />
+	<dubbo:service interface="com.onlyou.oversea.vop.ssm.service.IOperaBannerService" ref="operaBannerService" />
+	<dubbo:service interface="com.onlyou.oversea.vop.ssm.service.IPartnerRoleService" ref="partnerRoleService"/>
+	<dubbo:service interface="com.onlyou.oversea.vop.ssm.service.IPartnerWorkbenchService" ref="partnerWorkbenchService"/>
+	<dubbo:service interface="com.onlyou.oversea.vop.ssm.service.IPartnerMessageService" ref="partnerMessageService"/>
+	<dubbo:service interface="com.onlyou.oversea.vop.ssm.service.IPartnerNoticeService" ref="partnerNoticeService"/>
+	<dubbo:service interface="com.onlyou.oversea.vop.ssm.service.IOverseaUserPartnerService" ref="overseaUserPartnerService" />
+	<!--ssm end-->
+
+	<!--report start 报表-->
+	<dubbo:service interface="com.onlyou.oversea.vop.report.service.IPartnerStaffKPIService" ref="partnerStaffKPIService"/>
+	<!--report end-->
+
+	<!--pnm start 渠道模块-->
+	<dubbo:service interface="com.onlyou.oversea.vop.pnm.service.IOverseaPartnerService" ref="overseaPartnerService" />
+	<dubbo:service interface="com.onlyou.oversea.vop.pnm.service.IPartnerBankService" ref="overseaPartnerBankService" />
+	<dubbo:service interface="com.onlyou.oversea.vop.pnm.service.IOperaPartnerService" ref="operaPartnerService" />
+	<!--pnm end-->
+
+	<!--corp start 企业(客户)模块-->
+	<dubbo:service interface="com.onlyou.oversea.vop.corp.service.IPartnerCorpService" ref="partnerCorpService" />
+	<dubbo:service interface="com.onlyou.oversea.vop.corp.service.IPartnerCorpOwnerService" ref="partnerCorpOwnerService" />
+	<dubbo:service interface="com.onlyou.oversea.vop.bdm.service.IPartnerOrgService" ref="partnerOrgService" />
+	<dubbo:service interface="com.onlyou.oversea.vop.corp.service.IPartnerCorpPhotoLogService" ref="partnerCorpPhotoLogService"/>
+	<!--corp end-->
+
+	<!--bil start 票据模块-->
+	<dubbo:service interface="com.onlyou.oversea.vop.bil.service.IPartnerBillAttachmentService" ref="partnerBillAttachmentService" />
+	<!--bil end-->
+
+	<!--bdm start 基础模块-->
+	<!--bdm end-->
+
+	<!--common start 公共模块-->
+	<dubbo:service interface="com.onlyou.oversea.vop.common.service.IOverSeaLoginService" ref="overSeaLoginService" />
+	<dubbo:service interface="com.onlyou.oversea.vop.common.service.IPartnerAcctService" ref="partnerAcctService" />
+	<dubbo:service interface="com.onlyou.oversea.vop.common.service.IFeedbackService" ref="feedbackService" />
+	<!--common end-->
+
+	<!-- ============================================ OVERSEA VOP end========================================-->
+
+    <!-- ============================================ VOP start ============================================ -->
+    <!-- 凤巢服务 -->
+    <!-- ssm start -->
+    <dubbo:service interface="com.onlyou.malay.vop.ssm.service.IUserPartnerService" ref="userPartnerService" />
+    <dubbo:service interface="com.onlyou.malay.vop.ssm.service.IUserService" ref="userService" />
+    <dubbo:service interface="com.onlyou.malay.vop.ssm.service.IMenuService" ref="menuService" />
+    <dubbo:service interface="com.onlyou.malay.vop.ssm.service.IFuncAuthService" ref="funcAuthService" />
+    <dubbo:service interface="com.onlyou.malay.vop.ssm.service.IAuthorizationService" ref="authorizationService" />
+    <dubbo:service interface="com.onlyou.malay.vop.ssm.service.IRoleFuncService" ref="roleFuncService" />
+    <dubbo:service interface="com.onlyou.malay.vop.ssm.service.IUserRoleFuncService" ref="userRoleFuncService" />
+    <dubbo:service interface="com.onlyou.malay.vop.ssm.service.ISysOperateLogService" ref="sysOperateLogService" />
+	<dubbo:service interface="com.onlyou.malay.vop.ssm.service.ISysNoticeService" ref="sysNoticeService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.ssm.service.IShortcutMenuService" ref="shortcutMenuService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.ssm.service.ISyncAuthService" ref="syncAuthService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.ssm.service.IUserCountryService" ref="userCountryService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.ssm.service.IOemUserService" ref="oemUserService" />
+	<dubbo:service interface="com.onlyou.malay.vop.rnm.service.IUserResellerService" ref="userResellerService"/>
+    <!-- ssm   end -->
+    
+    <!-- bdm start -->
+    <dubbo:service interface="com.onlyou.malay.vop.bdm.service.ICodeService" ref="codeService" />
+    <dubbo:service interface="com.onlyou.malay.vop.bdm.service.IParamSettingsService" ref="paramSettingsService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IRefRelationCheckService" ref="refRelationCheckService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.ICommonStoreService" ref="commonStoreService" />
+
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IBankBranchService" ref="bankBranchService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IAttachmentService" ref="attachmentService" />
+
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IDmnCountryService" ref="dmnCountryService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IDomainService" ref="domainService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IOemFirmService" ref="oemFirmService" />
+
+    <!-- bdm   end -->
+	<!-- common -->
+    <dubbo:service interface="com.onlyou.malay.vop.common.service.ISerialService" ref="serialService" />
+	<dubbo:service interface="com.onlyou.malay.vop.common.service.IEmailBindingService" ref="emailBindingService" />
+	<dubbo:service interface="com.onlyou.malay.vop.common.service.IOssService" ref="ossService" />
+	<dubbo:service interface="com.onlyou.malay.vop.common.service.IFileService" ref="fileService" />
+
+	<!-- 批处理服务 -->
+	<!--<dubbo:service interface="com.onlyou.malay.batch.service.IQuartzBatchService"  ref="quartzBatchService"/>-->
+
+	<!-- pnm start-->
+	<dubbo:service interface="com.onlyou.malay.vop.pnm.service.IPartnerService"  ref="partnerService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.pnm.service.IPartnerBankService"  ref="partnerBankService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.pnm.service.IPartnerCountryService"  ref="partnerCountryService"/>
+
+	<!-- pnm end-->
+	
+	<!-- ord start -->
+	<!--<dubbo:service interface="com.onlyou.malay.vop.ord.service.IOrderService"  ref="orderService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.ord.service.IProductService"  ref="productService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.ord.service.IRenewalDetailService"  ref="renewalDetailService" />-->
+	<!-- ord   end -->
+	
+	<!--svr start -->
+	<!--<dubbo:service interface="com.onlyou.malay.vop.svr.service.IServiceService"  ref="serviceService" />-->
+	<dubbo:service interface="com.onlyou.malay.vop.svr.service.IDunningService"  ref="dunningService" />
+	<!--<dubbo:service  interface="com.onlyou.malay.vop.svr.service.ICommentTaskService"  ref="commentTaskService" />-->
+	<!--svr end -->
+	
+	<!--amt start -->
+	<!--<dubbo:service interface="com.onlyou.malay.vop.amt.service.IPayPlanService"  ref="payPlanService" />
+	<dubbo:service interface="com.onlyou.malay.vop.amt.service.IPayPlanLogService"  ref="payPlanLogService" />
+	<dubbo:service interface="com.onlyou.malay.vop.amt.service.IAccountService" ref="accountService" />
+	<dubbo:service interface="com.onlyou.malay.vop.amt.service.IUserAcctDetailService" ref="userAcctDetailService" />
+	<dubbo:service interface="com.onlyou.malay.vop.amt.service.IPayLogService" ref="payLogService" />-->
+
+	<!--amt end -->
+	
+	<!-- 区域架构
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.ISvrZoneService" ref="svrZoneService" /> -->
+	<!-- 组织架构-->
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IOrgService" ref="orgService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.ITaxofficeService" ref="taxofficeService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IFieldSerOrgService" ref="fieldSerOrgService" />
+	<!-- 员工档案 -->
+	<dubbo:service interface="com.onlyou.malay.vop.pnm.service.IStaffService" ref="staffService" />
+
+	<!-- 企业管理 -->
+	<dubbo:service interface="com.onlyou.malay.vop.cor.service.ICorpService" ref="corpService" /> 
+	<dubbo:service interface="com.onlyou.malay.vop.cor.service.ICorpOwnerService" ref="corpOwnerService" />
+	<dubbo:service interface="com.onlyou.malay.vop.cor.service.IBpoScanCertService" ref="bpoScanCertService" />
+	<dubbo:service interface="com.onlyou.malay.vop.cor.service.ICorpPhotoLogService" ref="corpPhotoLogService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.cor.service.ICorpMoveService" ref="corpMoveService" />
+	<dubbo:service interface="com.onlyou.malay.vop.cor.service.ICorpMindSettingService" ref="corpMindSettingService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.cor.service.IWrongDocService" ref="wrongDocService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.cor.service.IClientAnalysisReportService" ref="clientAnalysisReportService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.cor.service.ICorpUserService" ref="corpUserService"/>
+
+
+	<!-- 任务模块 -->
+	<dubbo:service interface="com.onlyou.malay.vop.tsk.service.IGlTaskService" ref="glTaskService" /> 
+	<!--<dubbo:service interface="com.onlyou.malay.vop.tsk.service.IRegTaskService" ref="regTaskService" />
+	<dubbo:service interface="com.onlyou.malay.vop.tsk.service.IServiceTaskService" ref="serviceTaskService" />-->
+
+	<!-- 票据模块 -->
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IActPageService" ref="actPageService" /> 
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillItemService" ref="billItemService" /> 
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillService" ref="billService" /> 
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillOcrService" ref="billOcrService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IInterfaceService" ref="interfaceService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.ILabelMsgService" ref="labelMsgService" /> 
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IParseErrorService" ref="parseErrorService" /> 
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.ITaxService" ref="taxService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IActStatementService" ref="actStatementService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillTotalService" ref="billTotalService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillAttachmentService" ref="billAttachmentService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillParsePathService" ref="billParsePathService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillLogService" ref="billLogService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillParseService" ref="billParseService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillStatisticsService" ref="billStatisticsService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillAttachmentOssService" ref="billAttachmentOssService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IActOcrPageService" ref="actOcrPageService" />
+
+	<!-- 票据中心改造 -->
+	<dubbo:service interface="com.onlyou.bpc.external.service.IMalayExternalBpcService" ref="malayExternalBpcService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bpc.service.IParseTaskService" ref="parseTaskService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bpc.service.IInterfaceLogService" ref="interfaceLogService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bpc.service.IBillMonitorService" ref="billMonitorService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bpc.service.IParseBillService" ref="parseBillService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bpc.service.IInvoiceService" ref="invoiceService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bpc.service.IBpcBankStatementService" ref="bpcBankStatementService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bpc.service.IBankStatementSortService" ref="bankStatementSortService" />
+	<dubbo:service interface="com.onlyou.malay.vop.bpc.service.IExceptionBillService" ref="exceptionBillService" />
+	<dubbo:service interface="com.onlyou.malay.pub.service.IMalayPublicService" ref="malayPublicService" timeout="5000"/>
+
+	<!-- 提醒消息模块 -->
+	<dubbo:service interface="com.onlyou.malay.vop.wrk.service.IWarningMsgService" ref="warningMsgService"/>
+
+	<!-- 统计报表 -->
+	<!--<dubbo:service interface="com.onlyou.malay.vop.sta.service.IReportService" ref="reportService"/>-->
+	<dubbo:service interface="com.onlyou.malay.vop.sta.service.ICustomerActiveService" ref="customerActiveService"/>
+
+	<!-- ============================================ VOP end ============================================ -->
+	
+	<!-- ============================================ ACCT start ============================================ -->
+	<!-- 云会计服务 -->
+
+	<!-- 设置 -->
+    <dubbo:service interface="com.onlyou.malay.acct.setup.service.IAcctSubjectService" ref="acctSubjectService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IAcctUbsSubjectService" ref="acctUbsSubjectService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.setup.service.ISettleService" ref="settleService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IAcctBankService" ref="acctBankService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IRateAdjustService" ref="rateAdjustService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IAcctRuleService" ref="acctRuleService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.ICurrencyService" ref="currencyService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IAcctParamService" ref="acctParamService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.INewAccountService" ref="newAccountService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IIndustryCodeService" ref="industryCodeService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IFiscalYearService" ref="fiscalYearService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IAcctBuildService" ref="acctBuildService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.ICodeRuleService" ref="codeRuleService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IAcctSubjectTemplateService" ref="acctSubjectTemplateService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IBankBalanceService" ref="bankBalanceService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IEmailLogService" ref="emailLogService"/>
+
+	<!-- 加盟商 -->
+	<dubbo:service interface="com.onlyou.malay.acct.partner.service.IDepartmentService" ref="departmentService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.partner.service.IAcctPartnerService" ref="acctPartnerService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.partner.service.IEmployeeService" ref="employeeService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.partner.service.IPartnerAccountService" ref="partnerAccountService" />
+	<dubbo:service interface="com.onlyou.malay.acct.partner.service.IPartnerAddressService" ref="partnerAddressService" />
+	<dubbo:service interface="com.onlyou.malay.acct.partner.service.IOthersService" ref="othersService"/>
+
+    <dubbo:service interface="com.onlyou.malay.acct.gst.service.ITaxReportService" ref="taxReportService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.gst.service.ITaxRateService" ref="taxRateService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.gst.service.ITaxPayerService" ref="taxPayerService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.gst.service.ILorryService" ref="lorryService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.gst.service.ISelfBilledSupplierService" ref="selfBilledSupplierService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.common.service.IBadDebtReliefService" ref="badDebtReliefService"/>
+
+    <dubbo:service interface="com.onlyou.malay.acct.system.service.IDictValueService" ref="dictValueService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.system.service.IImportResultService" ref="importResultService"/>
+    <dubbo:service interface="com.onlyou.malay.vop.common.service.ICommonImportService" ref="commonImportService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.system.service.IAcctModuleRefService" ref="acctModuleRefService"/>
+
+    <dubbo:service interface="com.onlyou.malay.acct.vop.service.IVopCodeEntityService" ref="vopCodeEntityService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.vop.service.IVopCorpEntityService" ref="vopCorpEntityService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.vop.service.IVopCorpSwitchService" ref="vopCorpSwitchService"/>
+
+    <!-- 单据处理 -->
+    <dubbo:service interface="com.onlyou.malay.acct.common.service.IBillBusinessActionService" ref="billBusinessActionService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.common.queryformula.IQueryFormula" ref="queryFormula"/>
+    <dubbo:service interface="com.onlyou.malay.acct.sales.service.IReceivablesChargeAgainstService" ref="receivablesChargeAgainstService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.purchase.service.IPaymentChargeAgainstService" ref="paymentChargeAgainstService"/>
+
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.IMemoryOutput" ref="memoryOutput"/>
+    <dubbo:service interface="com.onlyou.malay.acct.sales.service.ISaleInvoiceService" ref="saleInvoiceService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.sales.service.ISaleCreditNoteService" ref="saleCreditNoteService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.sales.service.ISaleReceivablesService" ref="saleReceivablesService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.ISalesReportService" ref="salesReportService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.ICustomerLedgerService" ref="customerLedgerService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.IBillCustomInfoService" ref="billCustomInfoService"/>
+
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.ISaleQuotationService" ref="saleQuotationService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.ISaleOrderService" ref="saleOrderService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.ISaleOutService" ref="saleOutService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.ISaleReturnService" ref="saleReturnService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.ITwentyOneRulesService" ref="twentyOneRulesService"/>
+
+    <dubbo:service interface="com.onlyou.malay.acct.purchase.service.IPurchaseInvoiceService" ref="purchaseInvoiceService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.purchase.service.IPurchaseCreditNoteService" ref="purchaseCreditNoteService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.purchase.service.IPurchasePaymentService" ref="purchasePaymentService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.purchase.service.IPurchaseReportService" ref="purchaseReportService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.purchase.service.ISupplierLedgerService" ref="supplierLedgerService"/>
+
+	<dubbo:service interface="com.onlyou.malay.acct.purchase.service.IPurchaseOrderService" ref="purchaseOrderService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.purchase.service.IPurchaseInService" ref="purchaseInService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.purchase.service.IPurchaseReturnService" ref="purchaseReturnService"/>
+
+	<dubbo:service interface="com.onlyou.malay.acct.bank.service.IBankExpenceService" ref="bankExpenceService"/>
+    <dubbo:service interface="com.onlyou.malay.acct.bank.service.IBankPaymentService" ref="bankPaymentService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bank.service.IBankReceivablesService" ref="bankReceivablesService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.otherbill.service.IOtherBillService" ref="otherBillService"/>
+
+	<dubbo:service interface="com.onlyou.malay.acct.bank.service.IBankStatementService" ref="bankStatementService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bank.service.IBankBalanceAdjustService" ref="bankBalanceAdjustService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bank.service.IBankStatementItemService" ref="bankStatementItemService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bank.service.IBankStatementLogService" ref="bankStatementLogService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bank.service.IBankStatementItemLogService" ref="bankStatementItemLogService"/>
+
+	<dubbo:service interface="com.onlyou.malay.acct.sales.service.IImportSaleInvoiceService" ref="importSaleInvoiceService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.purchase.service.IImportPurchaseInvoiceService" ref="importPurchaseInvoiceService"/>
+
+	<!-- 凭证 -->
+	<dubbo:service interface="com.onlyou.malay.acct.voucher.service.IFinanceInitBalanceService" ref="financeInitBalanceService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.voucher.service.IAcctVoucherService" ref="acctVoucherService" />
+	<dubbo:service interface="com.onlyou.malay.acct.voucher.service.IEditVoucherService" ref="editVoucherService" />
+	<dubbo:service interface="com.onlyou.malay.acct.voucher.service.IArApBalanceService" ref="arApBalanceService" />
+	<dubbo:service interface="com.onlyou.malay.acct.voucher.service.IVoucherMessageService" ref="voucherMessageService" />
+
+	<!-- 账期 -->
+	<dubbo:service interface="com.onlyou.malay.acct.period.service.IAcctPeriodService" ref="acctPeriodService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.period.service.IGstPeriodService" ref="gstPeriodService"/>
+	
+	<!-- 期末调汇 -->
+	<dubbo:service interface="com.onlyou.malay.acct.period.service.IFinalProcessingService" ref="finalProcessingService" />
+	<dubbo:service interface="com.onlyou.malay.acct.period.service.ICloseAccountService" ref="closeAccountService" />
+
+	<!-- 年结 -->
+	<dubbo:service interface="com.onlyou.malay.acct.period.service.ICloseFinancialYearEndService" ref="closeFinancialYearEndService" />
+	<dubbo:service interface="com.onlyou.malay.acct.period.service.IBizLockService" ref="bizLockService" />
+	<dubbo:service interface="com.onlyou.malay.acct.period.service.ILossGainForwardService" ref="lossGainForwardService" />
+	<dubbo:service interface="com.onlyou.malay.acct.period.service.ITrialBalanceService" ref="trialBalanceService" />
+
+	<!-- 登录 -->
+	<dubbo:service interface="com.onlyou.malay.acct.common.service.IAcctLoginService" ref="acctLoginService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.common.service.IAcctCommonService" ref="acctCommonService"/>
+
+	<!-- 票据 -->
+	<dubbo:service interface="com.onlyou.malay.acct.vop.image.service.IImageService" ref="imageService"/>
+
+	<!-- 报表 -->
+	<dubbo:service interface="com.onlyou.malay.acct.report.service.IReportSheetService" ref="reportSheetService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.report.service.IReportBalanceSheetService" ref="reportBalanceSheetService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.report.service.IReportProfitSheetService" ref="reportProfitSheetService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.report.service.IReportProfitMonthlySheetService" ref="reportProfitMonthlySheetService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.report.service.IReportSubsidiaryLedgerSheetService" ref="reportSubsidiaryLedgerSheetService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.report.service.IReportTrialBalanceSheetService" ref="reportTrialBalanceSheetService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.report.service.IPaymentAnalysisRecordService" ref="paymentAnalysisRecordService"/>
+
+	<dubbo:service interface="com.onlyou.malay.acct.gst.service.IMsicReportService" ref="msicReportService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.gst.service.IGstReportService" ref="gstReportService" />
+	<dubbo:service interface="com.onlyou.malay.acct.gst.service.ILampiranReportService" ref="lampiranReportService" />
+	<dubbo:service interface="com.onlyou.malay.acct.gst.service.IGstAuditTrailService" ref="gstAuditTrailService" />
+	<dubbo:service interface="com.onlyou.malay.acct.setup.service.IExpenseItemService" ref="expenseItemService" />
+	<dubbo:service interface="com.onlyou.malay.acct.gst.service.IGafService" ref="gafService" />
+	<dubbo:service interface="com.onlyou.malay.acct.gst.service.IGstCheckReportService" ref="gstCheckReportService"/>
+
+	<!-- 固定资产 -->
+	<dubbo:service interface="com.onlyou.malay.acct.fa.service.IFaClassService" ref="faClassService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.fa.service.IFaCardService" ref="faCardService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.fa.service.IFaCardDepnService" ref="faCardDepnService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.fa.service.IFaPayCardService" ref="faPayCardService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.fa.service.IFaPayPlanService" ref="faPayPlanService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.fa.service.IFaReportService" ref="faReportService"/>
+
+	<!-- 基础资料-->
+	<dubbo:service interface="com.onlyou.malay.acct.bd.service.IAgentService" ref="agentService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bd.service.IAreaService" ref="areaService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bd.service.IWarehouseService" ref="warehouseService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bd.service.IProjectService" ref="projectService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bd.service.IMeasdocService" ref="measdocService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bd.service.IInvclassService" ref="invclassService"/>
+	<!--库存-->
+	<dubbo:service interface="com.onlyou.malay.acct.bd.service.IStockBalanceService" ref="stockBalanceService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.bd.service.IInventoryService" ref="inventoryService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.stock.service.IStockTransferService" ref="stockTransferService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.stock.service.IStockCardReportService" ref="stockCardReportService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.stock.service.IStockGroupReportService" ref="stockGroupReportService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.stock.service.IStockSalesReportService" ref="stockSalesReportService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.stock.service.IStockPurchaseReportService" ref="stockPurchaseReportService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.stock.service.IStockAdjustmentService" ref="stockAdjustmentService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.period.service.ICloseStockLedgerService" ref="closeStockLedgerService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.stock.service.IStockItemReportService" ref="stockItemReportService"/>
+
+	<!--单据联查-->
+	<dubbo:service interface="com.onlyou.malay.acct.common.relatedbill.service.IRelatedBillService" ref="relatedBillService"/>
+
+	<!-- 仪表盘-->
+	<dubbo:service interface="com.onlyou.malay.acct.guide.service.IDashBoardService" ref="dashBoardService"/>
+
+	<!-- ============================================ ACCT end ============================================ -->
+
+	<!-- ============================================ Portal begin ============================================ -->
+	<dubbo:service interface="com.onlyou.malay.vop.common.service.IMessageService" ref="messageService" />
+	<dubbo:service interface="com.onlyou.malay.portal.service.IPortalUserService" ref="portalUserService" />
+	<!--============================================ Portal end ============================================-->
+
+
+	<!-- ============================================ singapore begin ============================================ -->
+	<dubbo:service interface="com.onlyou.singapore.acct.gst.service.ISGTaxReportService" ref="sgTaxReportService"/>
+	<dubbo:service interface="com.onlyou.singapore.acct.gst.service.IIafService" ref="iafService"/>
+	<!-- ============================================ singapore end ============================================ -->
+
+	<!-- ============================================ Reseller begin ============================================ -->
+	<dubbo:service interface="com.onlyou.malay.vop.rnm.service.IResellerService" ref="resellerService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.rnm.service.IResellerPartnerService" ref="resellerPartnerService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.rnm.service.ISalesmanService" ref="salesmanService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.rnm.service.IResellerCorpService" ref="resellerCorpService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.rnm.service.IResellerPartnerBillService" ref="resellerPartnerBillService"/>
+	<!-- ============================================ Reseller end ============================================ -->
+
+	<!-- ============================================ GiftRules begin ============================================ -->
+	<dubbo:service interface="com.onlyou.malay.acct.gift.service.IGiftRulesService" ref="giftRulesService"/>
+	<!-- ============================================ GiftRules end ============================================ -->
+
+	<dubbo:service interface="com.onlyou.malay.acct.syncentrybillref.service.ISyncEntryBillRefService" ref="syncEntryBillRefService"/>
+
+	<!-- ============================================ FineReport begin ============================================ -->
+	<dubbo:service interface="com.onlyou.malay.acct.fr.service.IBillFineReportService" ref="billFineReportService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.fr.service.ISsmLocaleService" ref="ssmLocaleService"/>
+
+	<!-- ============================================ FineReport end ============================================ -->
+
+	<!-- ============================================ 模板管理 开始 ============================================ -->
+	<dubbo:service interface="com.onlyou.malay.vop.tpm.service.IReportTemplateService" ref="reportTemplateService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.tpm.service.IReportTemplateTypeService" ref="reportTemplateTypeService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.tpm.service.IReportTemplatePartnerService" ref="reportTemplatePartnerService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.tpm.service.IReportTemplateClientService" ref="reportTemplateClientService"/>
+	<!-- ============================================ 模板管理 结束 ============================================ -->
+
+	<!-- ============================================ VOP字典服务 开始 ============================================ -->
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IVopDictTypeService" ref="vopDictTypeService"/>
+	<dubbo:service interface="com.onlyou.malay.vop.bdm.service.IVopDictValueService" ref="vopDictValueService"/>
+	<!-- ============================================ VOP字典服务 结束 ============================================ -->
+
+	<!--空白影像检测服务-->
+	<dubbo:service interface="com.onlyou.malay.image.IImageDetectService" ref="imageDetectService"/>
+
+	<!-- ============================================ OCR与大数据票据比对 开始 ============================================ --><!---->
+	<dubbo:service interface="com.onlyou.malay.vop.bil.service.IBillCompareService" ref="billCompareService"/>
+	<dubbo:service interface="com.onlyou.malay.acct.gst.service.IGstSpiderService" ref="gstSpiderService"/>
+	<!-- ============================================ OCR与大数据票据比对 结束 ============================================ --><!---->
+</beans>

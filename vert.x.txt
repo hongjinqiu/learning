@@ -1,0 +1,79 @@
+https://vertx.io/
+
+一个 vert.x 的教程,
+https://www.jianshu.com/p/2ab64267ae2c
+
+http://vertx.io/docs/guide-for-java-devs/
+
+vertx 的 jdbc client,
+http://vertx.io/docs/vertx-mysql-postgresql-client/java/
+
+event bus,
+一个由事件驱动的框架,
+
+vert.x-sync,也比较麻烦，
+https://segmentfault.com/a/1190000006098059
+
+
+关于Vertx+Spring+Mybatis+Redis+Zookeeper+Dubbo构建分布式服务
+https://www.jianshu.com/p/3ce2b49a0f41
+
+vert.x 的示例教程：
+https://github.com/vert-x3/vertx-guide-for-java-devs
+
+
+Project Loom: Fibers and Continuations for the Java Virtual Machine
+https://link.zhihu.com/?target=http%3A//cr.openjdk.java.net/~rpressler/loom/Loom-Proposal.html
+
+https://link.zhihu.com/?target=https%3A//wiki.openjdk.java.net/display/loom/Main
+
+spring 已经可以使用 coroutine,要用 kotlin,
+https://spring.io/blog/2019/04/12/going-reactive-with-spring-coroutines-and-kotlin-flow
+
+
+Java 平台的首席架构师 Mark Reinhold 做了The Future of Java is Today的演讲
+
+https://github.com/electronicarts/ea-async
+
+
+jdbc:
+
+dubbo 的包装，
+
+mongo 的包装，
+
+继续阅读,
+
+Event loop, verticle,
+
+线程接收网络事件流,并以事件，最终传给 verticle 来处理,
+
+各个 verticle 之间,通过 Event Bus 来交流信息.
+
+json 是推荐使用的数据交换格式。 
+
+Event bus 支持以下三种消息模式:
+1.point-to-point messaging,
+2.request-response messaging,
+3.publish / subscribe for broadcasting messages
+
+当开启网络集群时，Event Bus可跨 jvm 进行消息通讯。
+
+command-line tool,
+
+明白了，这个 promise ,就一个用来最终成功的东东，
+
+看到了 Refactoring into independent and reusable verticles,
+
+重构成两个 Http Verticle,以及一个 Database Client Verticle,
+
+通过 event-bus 来分发，
+
+<li><a onclick="pageObj.importSwitch(true)"><i class="iconfont icon-import"></i>导入开关</a></li>
+
+url : App["contextPath"]+'/ei/switch/importSwitch.json',
+
+不瞄了,重新看那个 Hbase,
+
+
+

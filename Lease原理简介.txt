@@ -1,0 +1,110 @@
+Lease是一种在分布式系统中,广泛使用的用于维护数据一致性的协议,通常中文叫:租约.
+
+Lease 通常定义为:颁发者在一定期限内給予持有者一定权利的协议.
+Lease 表达了颁发者在一定期限内的承诺，只要未过期颁发者必须严格遵守 lease 约定的承诺。
+Lease 的持有者在期限内使用颁发者的承诺，但 lease 一旦过期必须放弃使用或者重新和颁发者续约。
+
+下文以一个例子来说明 Lease 的算法流程。
+例子:一个主从结构的分布式系统中，[Master服务器]，存放数据。为了减少对Master服务器的访问，提高性能，将数据拷贝到[Slave服务器]节点中，分担读请求。
+客户端可随机挑选一台服务器访问数据。
+要求:
+1.[Master服务器]与[Slave服务器]数据必须保持一致。
+2.尽可能处理节点宕机,网络中断等异常.
+
+应对方式:读写分离，[Master服务器]处理写请求，[Master服务器]向[Slave服务器]发放数据和 Lease，[Master服务器]或[Slave服务器]处理读请求。
+
+HDFS中 Lease 的数据结构为:
+class Lease implements Comparable<Lease> {
+    private final String holder;	// 租约持有者（即：DFSClient）
+    private long lastUpdate;		// 上次续约时间
+    private final Collection<String> paths = new TreeSet<String>();	// 租约持有的文件路径
+    ......
+
+    // 判断租约过期的方法,这个 softLimit 为系统配置,默认 1 分钟.
+    public boolean expiredSoftLimit() {
+      return now() - lastUpdate > softLimit;
+    }
+}
+
+(注:HDFS中,Lease 并没有用于这个例子的类似情形，而是用于多客户端操作文件，比如:两个客户端同时追加某个文件，一方持有 Lease,另一个会失败。
+这边只是借用数据结构来举例说明。)
+
+
+基于 Lease 的数据读取流程为:
+1.[Slave服务器]接收到数据读取请求,
+2.[Slave服务器]判断数据是否是否处于本地,并且 Lease 在有效期内.
+2.1.是:直接返回数据,
+2.2.否:向[Master服务器]请求数据
+2.2.1.[Master服务器]收到请求,返回数据和对应的 Lease,
+2.2.2.[Slave服务器]是否成功接收到数据
+2.2.2.1.失败或超时:退出流程，读取失败，重试
+2.2.2.2.成功:保存数据和 Lease,
+
+
+基于 Lease 的数据修改流程为:
+1.[Master服务器]收到数据修改请求,
+2.[Master服务器]收到修改请求后,阻塞所有的数据读请求,即接收读请求,但是不返回数据
+3.[Master服务器]等待与数据相关的 Lease 超时,
+4.[Master服务器]修改数据并返回修改成功.
+
+
+按这个流程，可以保证[Master服务器]与[Slave服务器]数据一致。
+在 Lease 期间内,[Master服务器]不会修改数据，阻塞写直到 Lease 过期。
+[Master服务器]修改完数据后,不管[Slave服务器]有没有接收到,只要 Lease 过期,客户端总可以读取到最新值.
+
+显然，这种方式，有一定的性能和可用性问题。
+1.[Master服务器]在修改数据时,会阻塞所有的读,等待 Lease 过期。这是因为读取数据时,会颁发 Lease,新的 Lease 过期时间比较长，而会导致数据不一致。
+可以优化为:
+1.1.在[Master]进入修改数据时,只返回数据，而不返回 Lease。这样一来,[Slave服务器]可以读取到数据,却不会缓存。
+进一步优化为:
+1.2.在[Master]进入修改数据时,返回数据，也返回 Lease，但是 Lease 的期限为已颁发的 Lease 的最大期限值。
+这样一来，[Slave服务器]也可以以一个比较小的期限缓存数据。
+
+2.[Master服务器]在修改数据时,会阻塞所有的读,等待 Lease 过期。会造成修改数据需要等待 Lease 过期再返回,需要花费较长时间.
+可以优化为:
+在等待 Lease 过期的时间内,[Master服务器]通知拥有 Lease 的[Slave服务器]放弃 Lease,清除数据.如果通知的过程中,失败和超时,重新等待 Lease 过期.
+
+可见 Lease 机制,读取性能比较高,但是写性能比较低,数据可以达到强一致性.
+
+Lease机制依赖于有效期，要求[Master服务器]和[Slave服务器]时钟一致.
+如果[Master服务器]与[Slave服务器]时钟不一致.
+1.[Master服务器]时间比[Slave服务器]慢,
+例如:[Master服务器]为 10:00:05，而[Slave服务器]为10:00:00,
+会造成[Master服务器] 认为数据已经过期，而[Slave服务器]认为数据依然有效。
+此时[Master服务器]修改了数据,客户端有可能从[Slave服务器]读取到旧的数据。
+此时,需要调整 Lease 的期限，使得[Master服务器]的 Lease 期限较大(Lease_M)，而[Slave服务器]的 Lease 期限小(Lease_S),
+要求 (Lease_M - Lease_S) 差值超过服务器的时钟间距。
+
+2.[Master服务器]时间比[Slave服务器]快,
+例如:[Master服务器]为 10:00:00，而[Slave服务器]为10:00:05,
+[Slave服务器]认为 Lease 过期了,而[Master服务器]认为还没过期。
+客户端读取数据时,[Slave服务器]会向[Master服务器]请求数据，而不会出现数据不一致的问题.
+
+
+在HDFS中,在创建文件,追加文件的过程中,使用了 Lease 机制来维护 NameNode 文件元数据信息一致性.
+HDFS中,NameNode 为单节点,通过 Zookeeper,来保持高可用性.
+Lease的应用场景与例子中提到的多服务器间数据同步不同。
+基本上就是:创建文件，颁发 Lease,commit 文件，清除 Lease。
+追加文件，颁发 Lease,追加文件过程中宕机了，另一个想追加文件的进程，需要等待 Lease 过期，或强行清除旧 Lease，才可以再进行文件相关操作。
+
+
+
+
+
+
+HDFS中,
+http://www.cnblogs.com/ucarinc/p/8064447.html
+已经说得比较详细了,
+神州租车,一、租约详解
+
+
+http://www.cnblogs.com/foxmailed/p/4151735.html
+HDFS Lease Recovey 和 Block Recovery
+吴镝,
+
+
+
+http://jiangbo.me/blog/2012/10/18/hdfs-namenode-lease-management/
+HDFS源码学习（6）——租约管理（lease management)
+
+
